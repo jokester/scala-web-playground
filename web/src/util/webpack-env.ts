@@ -5,7 +5,7 @@ interface WebpackEnv {
 }
 
 const DefaultWebpackEnv = {
-  REACT_APP_WS_URL: 'ws://127.0.0.1:18080/ws/chat2',
+  REACT_APP_WS_URL: 'ws://127.0.0.1:18080/chatroom/ws',
 };
 
 export function getWebpackEnv<ExtraEnv extends {} = {}>() {

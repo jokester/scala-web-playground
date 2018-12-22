@@ -1,1 +1,1 @@
-export * from './chat2-ts/api';
+export * from './chatroom-ts.gen/api';

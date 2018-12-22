@@ -7,6 +7,7 @@ import com.typesafe.scalalogging.LazyLogging
 import spray.json.{ DefaultJsonProtocol, RootJsonFormat }
 
 trait BlobSerialization extends SprayJsonSupport with DefaultJsonProtocol with LazyLogging {
+
   import io.jokester.scala_server_playground.util.UUID4json.UuidJsonFormat
 
   implicit val metaFormat: RootJsonFormat[BlobMeta] = jsonFormat3(BlobMeta)

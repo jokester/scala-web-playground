@@ -1,5 +1,5 @@
 import {
-  Chat2Command,
+  ChatroomCommand,
   ServerAuthed,
   ServerBaseRes,
   ServerBroadcast,
@@ -74,7 +74,7 @@ export class WsEventSource extends TypedEventEmitter<DecodeEventMap> {
       return;
     }
 
-    const cmd: Chat2Command = decoded.cmd;
+    const cmd: ChatroomCommand = decoded.cmd;
 
     if (!(cmd && cmd.seq && cmd.method)) {
       logger.warn("cannot dispatch by cmd");

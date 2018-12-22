@@ -20,6 +20,7 @@ object UUID4pg {
 }
 
 object UUID4json {
+
   implicit object UuidJsonFormat extends JsonFormat[UUID] {
     def write(x: UUID) = JsString(x toString ())
 
@@ -27,4 +28,5 @@ object UUID4json {
       case JsString(x) => UUID.fromString(x)
     }
   }
+
 }

@@ -10,10 +10,6 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 trait WsInterface {
 
-  import UserMessage._
-  import ServerMessage._
-  import Internal._
-
   def retrieveCompleteMessage(msg: Message)(implicit m: Materializer): Future[TextMessage.Strict] = {
     implicit val ctx: ExecutionContext = m.executionContext
     msg match {

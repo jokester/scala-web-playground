@@ -1,6 +1,6 @@
 import { WsConnection, WsState } from './ws-connection';
 import {
-  Chat2Command,
+  ChatroomCommand,
   ServerAuthed,
   ServerJoinedChannel, ServerLeftChannel,
   ServerPong, ServerSentChat,
@@ -108,7 +108,7 @@ class WsMessageFactory {
     };
   }
 
-  private createCmd(method: string): Chat2Command {
+  private createCmd(method: string): ChatroomCommand {
     return {
       method,
       seq: ++this.msgSeq,

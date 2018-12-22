@@ -1,15 +1,15 @@
 package io.jokester.scala_server_playground
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.server.{HttpApp, Route}
+import akka.http.scaladsl.server.{ HttpApp, Route }
+import io.jokester.scala_server_playground.blob.{ BlobHandler, BlobRepoPG }
 import io.jokester.scala_server_playground.chatroom.ChatroomHandler
-import io.jokester.scala_server_playground.blob.{BlobHandler, BlobRepo, BlobRepoPG}
 import io.jokester.scala_server_playground.hello.HelloHandler
-import io.jokester.scala_server_playground.toy.{ToyHandler, ToyRoute}
+import io.jokester.scala_server_playground.toy.ToyHandler
 import io.jokester.scala_server_playground.util.RealWorld
 import io.jokester.scala_server_playground.ws.WsEchoHandler
 import scalikejdbc.config.DBs
-import scalikejdbc.{ConnectionPool, DB, GlobalSettings, LoggingSQLAndTimeSettings}
+import scalikejdbc.{ ConnectionPool, DB, GlobalSettings, LoggingSQLAndTimeSettings }
 
 import scala.concurrent.ExecutionContextExecutor
 
@@ -20,8 +20,7 @@ object PlaygroundScalaServer extends HttpApp {
     GlobalSettings.loggingSQLAndTime = LoggingSQLAndTimeSettings(
       enabled = true,
       singleLineMode = true,
-      logLevel = 'DEBUG
-    )
+      logLevel = 'DEBUG)
   }
 
   implicit def system: ActorSystem = systemReference.get
@@ -48,9 +47,9 @@ object PlaygroundScalaServer extends HttpApp {
   override def routes: Route = extractMaterializer { implicit materializer =>
     pathPrefix("hello")(helloHandler.route) ~ // curl -vv '127.0.0.1:18080/hello
       pathPrefix("toy")(toyHandler.route) ~
-      path("blob")(blobHandler.route) ~
-      path("chatroom")(chat2Handler.route) ~
-      path("ws-echo")(wsEchoHandler.route)
+      pathPrefix("blob")(blobHandler.route) ~
+      pathPrefix("chatroom")(chat2Handler.route) ~
+      pathPrefix("ws-echo")(wsEchoHandler.route)
   }
 }
 

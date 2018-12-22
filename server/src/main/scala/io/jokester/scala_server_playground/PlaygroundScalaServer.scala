@@ -37,7 +37,8 @@ object PlaygroundScalaServer extends HttpApp {
   private lazy val helloHandler = new HelloHandler
 
   override def routes: Route = extractMaterializer { implicit materializer =>
-    path("hello")(helloHandler.route) ~ // curl -vv '127.0.0.1:18080/hello
+    pathPrefix("hello")(helloHandler.route) ~ // curl -vv '127.0.0.1:18080/hello
+      path("toy")(toyHandler.route) ~
       path("blob")(blobHandler.route) ~
       path("chatroom")(chat2Handler.route) ~
       path("ws-echo")(wsEchoHandler.route)

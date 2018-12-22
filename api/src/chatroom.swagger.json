@@ -1,0 +1,221 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "src/chatroom.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "ServerAuthed": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/scala_server_playgroundCommand"
+        },
+        "identity": {
+          "$ref": "#/definitions/scala_server_playgroundUserInfo"
+        }
+      },
+      "required": [
+        "cmd",
+        "identity"
+      ]
+    },
+    "ServerBaseRes": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/scala_server_playgroundCommand"
+        }
+      },
+      "required": [
+        "cmd"
+      ]
+    },
+    "ServerBroadcast": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/scala_server_playgroundCommand"
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/scala_server_playgroundChannelInfo"
+          }
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/scala_server_playgroundChatMessage"
+          }
+        }
+      },
+      "required": [
+        "method",
+        "channels",
+        "messages"
+      ]
+    },
+    "ServerJoinedChannel": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/scala_server_playgroundCommand"
+        },
+        "channel": {
+          "$ref": "#/definitions/scala_server_playgroundChannelInfo"
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/scala_server_playgroundChatMessage"
+          }
+        }
+      },
+      "required": [
+        "cmd",
+        "channel",
+        "history"
+      ]
+    },
+    "ServerLeftChannel": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/scala_server_playgroundCommand"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cmd",
+        "reason"
+      ]
+    },
+    "ServerPong": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/scala_server_playgroundCommand"
+        }
+      },
+      "required": [
+        "cmd"
+      ]
+    },
+    "ServerSentChat": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/scala_server_playgroundCommand"
+        },
+        "msg": {
+          "$ref": "#/definitions/scala_server_playgroundChatMessage"
+        }
+      },
+      "required": [
+        "cmd",
+        "msg"
+      ]
+    },
+    "scala_server_playgroundChannelInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/scala_server_playgroundUserInfo"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "uuid"
+      ]
+    },
+    "scala_server_playgroundChatMessage": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "userUuid": {
+          "type": "string"
+        },
+        "channelUuid": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "title": "grpc-gateway: int32 -\u003e number@JS\ngrpc-gateway: int64 -\u003e string@JS\nguardrail:    int32 -\u003e Int@Scala\nguardrail:    int64 -\u003e int64 (error)\nso just use string (ISO8601)"
+        }
+      },
+      "required": [
+        "timestamp",
+        "userUuid",
+        "channelUuid",
+        "text"
+      ]
+    },
+    "scala_server_playgroundCommand": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "seq": {
+          "type": "integer",
+          "format": "int32",
+          "title": "user   initiated (e.g. command):   seqNo positive\nserver initiated (e.g. broadcast): seqNo negative"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "used in all api calls / returns, to pair req/res messages",
+      "required": [
+        "method",
+        "seq"
+      ]
+    },
+    "scala_server_playgroundUserInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "uuid"
+      ]
+    }
+  }
+}

@@ -2,7 +2,7 @@ package io.jokester.scala_server_playground.toy
 
 import scala.concurrent.Future
 
-class ToyRaceMemoryRepo extends ToyRepo {
+class UnsafeMemoryToyRepo extends ToyRepo {
   var state = ToyState(0, 0)
 
   override def getState: Future[ToyState] = Future.successful(state)
@@ -14,7 +14,7 @@ class ToyRaceMemoryRepo extends ToyRepo {
   }
 }
 
-class ToySynchronizedMemoryRepo extends ToyRepo {
+class SynchronizedMemoryToyRepo extends ToyRepo {
   var state = ToyState(0, 0)
 
   override def getState: Future[ToyState] = Future.successful {

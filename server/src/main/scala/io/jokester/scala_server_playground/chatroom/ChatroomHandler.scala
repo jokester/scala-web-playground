@@ -19,7 +19,7 @@ import io.jokester.scala_server_playground.util.Entropy
 class ChatroomHandler(implicit system: ActorSystem, implicit val entropy: Entropy)
   extends WsInterface with LazyLogging {
 
-  import ServerInternal._
+  import Internal._
 
   //  private lazy val manager = system.actorOf(Props[DaemonActor])
 

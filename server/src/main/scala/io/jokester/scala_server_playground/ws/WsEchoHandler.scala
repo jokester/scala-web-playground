@@ -7,7 +7,7 @@ import akka.stream.scaladsl._
 
 class WsEchoHandler() {
   def route: Route = {
-    path("echo") {
+    path("ws") {
       val echo = Flow[Message]
       handleWebSocketMessages(echo)
     }

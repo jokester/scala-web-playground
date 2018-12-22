@@ -4,14 +4,12 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.server.{HttpApp, Route}
 import io.jokester.scala_server_playground.chatroom.ChatroomHandler
 import io.jokester.scala_server_playground.blob.{BlobHandler, BlobRepo, BlobRepoPG}
-import io.jokester.scala_server_playground.toy.ToyRoute
+import io.jokester.scala_server_playground.hello.HelloHandler
+import io.jokester.scala_server_playground.toy.{ToyHandler, ToyRoute}
 import io.jokester.scala_server_playground.util.RealWorld
 import io.jokester.scala_server_playground.ws.WsEchoHandler
 import scalikejdbc.config.DBs
 import scalikejdbc.{ConnectionPool, DB}
-
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.directives._
 
 import scala.concurrent.ExecutionContextExecutor
 
@@ -32,14 +30,23 @@ object PlaygroundScalaServer extends HttpApp {
 
   private lazy val wsEchoHandler = new WsEchoHandler()
 
-  private lazy val chat2Handler = new ChatroomHandler
+  private lazy val chat2Handler = new ChatroomHandler()
+
+  private lazy val toyHandler = new ToyHandler(getDB _)
+
+  private lazy val helloHandler = new HelloHandler
 
   override def routes: Route = extractMaterializer { implicit materializer =>
-    path("blob") {
-      blobHandler.route
-    } ~ path("chatroom") {
-      chat2Handler.route
-    }
+    helloHandler.route ~
+      path("blob") {
+        blobHandler.route
+      } ~
+      path("chatroom") {
+        chat2Handler.route
+      } ~
+      path("ws-echo") {
+        wsEchoHandler.route
+      }
   }
 }
 

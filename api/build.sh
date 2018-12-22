@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -ue -x
 
 cd "$(dirname "$0")"
@@ -24,4 +23,4 @@ build-api () {
     -o "./$name-ts.gen"
 }
 
-build-api "chat2"
+build-api "chatroom"

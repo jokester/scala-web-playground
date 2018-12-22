@@ -13,7 +13,7 @@ object UserActor {
 
 class UserActor(uuid: UUID) extends Actor with ActorLogging with ActorLifecycleLogging {
 
-  import ServerInternal._
+  import Internal._
   import UserMessage._
   import ServerMessage._
   import CommonStruct._

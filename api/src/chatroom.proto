@@ -4,7 +4,7 @@ import "protoc-gen-swagger/options/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 
-package io.jokester.learning.scala_server.chat2;
+package io.jokester.scala_server_playground;
 
 // used in all api calls / returns, to pair req/res messages
 message Command {

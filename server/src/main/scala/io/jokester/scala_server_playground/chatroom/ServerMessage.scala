@@ -12,4 +12,5 @@ object ServerMessage {
 
   case class Authed(seq: Int, identity: UserInfo) extends ToUser(seq)
 
+  case class JoinedChannel(seq: Int, channel: Channel) extends ToUser(seq)
 }

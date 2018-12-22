@@ -1,12 +1,12 @@
 package io.jokester.scala_server_playground.chatroom
 
-import akka.http.scaladsl.model.ws.{ Message, TextMessage }
+import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.stream.Materializer
 import io.circe
 import io.circe.Json
 import io.jokester.scala_server_playground.chatroom.definitions._
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 trait WsInterface {
 
@@ -42,6 +42,9 @@ trait WsInterface {
         case n if n == "Auth" =>
           UserAuth.decodeUserAuth.decodeJson(json)
             .map(auth => UserMessage.Auth(auth.cmd.seq, name = auth.name, otp = auth.otp))
+        case n if n == "JoinChannel" =>
+          UserJoinChannel.decodeUserJoinChannel.decodeJson(json)
+            .map(m => UserMessage.JoinChannel(m.cmd.seq, name = m.name))
       }
     }
   }
@@ -52,6 +55,7 @@ trait WsInterface {
       case msg: ServerMessage.Pong => msg
       case msg: ServerMessage.Fail => msg
       case msg: ServerMessage.Authed => msg
+      case msg: ServerMessage.JoinedChannel => msg
     }
 
     TextMessage(json.toString())
@@ -76,8 +80,22 @@ trait WsInterface {
         chatroomCommand("Fail", msg.seq, Some(msg.errors.toIndexedSeq))))
   }
 
+  private implicit def convert(joined: ServerMessage.JoinedChannel): Json = {
+    ServerJoinedChannel.encodeServerJoinedChannel(
+      ServerJoinedChannel(
+        chatroomCommand("JoinedChannel", joined.seq),
+        joined.channel
+      )
+    )
+  }
+
   private implicit def convert(userInfo: Internal.UserInfo): chatroomUserInfo = {
     chatroomUserInfo(userInfo.name, userInfo.uuid.toString)
   }
 
+  private implicit def convert(channel: Internal.Channel): chatroomChannelInfo = {
+    chatroomChannelInfo(
+      name = channel.name,
+      uuid = channel.uuid.toString, users = Some(channel.users.toIndexedSeq.map(convert)))
+  }
 }

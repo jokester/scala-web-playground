@@ -1,8 +1,9 @@
-package io.jokester.scala_server_playground.chatroom
+package io.jokester.scala_server_playground.chatroom.actor
 
 import java.util.UUID
 
 import akka.actor._
+import io.jokester.scala_server_playground.chatroom.{Internal, ServerMessage, UserMessage}
 import io.jokester.scala_server_playground.util.ActorLifecycleLogging
 
 object UserActor {

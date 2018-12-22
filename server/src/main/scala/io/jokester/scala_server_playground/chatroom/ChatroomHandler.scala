@@ -8,6 +8,7 @@ import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.{Materializer, OverflowStrategy}
 import com.typesafe.scalalogging.LazyLogging
+import io.jokester.scala_server_playground.chatroom.actor.UserActor
 import io.jokester.scala_server_playground.util.Entropy
 
 /**

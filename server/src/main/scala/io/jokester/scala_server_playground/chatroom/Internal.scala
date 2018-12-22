@@ -6,7 +6,9 @@ import akka.actor.ActorRef
 
 object Internal {
 
-  case class UserConnected(actor: ActorRef)
+  case class UserConnected(outgoingActor: ActorRef)
+
+  case class UserDisconnected(uuid: UUID)
 
   case class User(name: String, uuid: UUID)
 

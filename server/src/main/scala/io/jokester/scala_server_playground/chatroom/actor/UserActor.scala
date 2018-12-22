@@ -71,4 +71,9 @@ class UserActor(uuid: UUID, daemon: ActorRef) extends Actor with ActorLogging wi
   private def wrapContext(inner: Receive): Receive = {
     handlePing orElse inner orElse catchUnhandledSeq
   }
+
+  override def postStop(): Unit = {
+    daemon ! UserDisconnected(uuid)
+    super.postStop()
+  }
 }

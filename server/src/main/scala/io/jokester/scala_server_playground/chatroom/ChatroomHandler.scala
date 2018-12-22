@@ -26,7 +26,9 @@ class ChatroomHandler(implicit system: ActorSystem, implicit val entropy: Entrop
 
   def newUserFlow()(implicit m: Materializer): Flow[Message, Message, NotUsed] = {
 
-    val userActor = system.actorOf(UserActor.props(entropy.nextUUID(), daemon))
+    // FIXME: userActor is not stopped until server down
+    val userUuid = entropy.nextUUID()
+    val userActor = system.actorOf(UserActor.props(userUuid, daemon))
 
     val incoming = Flow[Message]
       .mapAsync(1)(retrieveCompleteMessage)

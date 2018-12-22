@@ -5,11 +5,11 @@ import java.nio.ByteBuffer
 import java.util.UUID
 
 import com.google.common.io.ByteStreams
-import io.jokester.scala_server_playground.util.{Entropy, UUID4pg}
-import scalikejdbc.{DB, ResultName, WrappedResultSet, selectFrom}
+import io.jokester.scala_server_playground.util.{ Entropy, UUID4pg }
+import scalikejdbc.{ DB, ResultName, WrappedResultSet, selectFrom }
 import com.google.common.io.ByteStreams
-import io.jokester.scala_server_playground.util.{Entropy, UUID4pg}
-import scalikejdbc.{DB, _}
+import io.jokester.scala_server_playground.util.{ Entropy, UUID4pg }
+import scalikejdbc.{ DB, _ }
 
 class BlobRepoPG(getDB: () => DB)(implicit e: Entropy) extends BlobRepo {
 

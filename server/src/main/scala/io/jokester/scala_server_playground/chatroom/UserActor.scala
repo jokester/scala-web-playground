@@ -16,7 +16,6 @@ class UserActor(uuid: UUID) extends Actor with ActorLogging with ActorLifecycleL
   import Internal._
   import UserMessage._
   import ServerMessage._
-  import CommonStruct._
 
   var joinedRooms = Map.empty[String, ActorRef]
   var outgoing: Option[ActorRef] = None

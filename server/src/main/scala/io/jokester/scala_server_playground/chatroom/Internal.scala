@@ -1,6 +1,6 @@
 package io.jokester.scala_server_playground.chatroom
 
-import java.util.{Date, UUID}
+import java.util.{ Date, UUID }
 
 import akka.actor.ActorRef
 

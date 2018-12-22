@@ -3,8 +3,8 @@ package io.jokester.scala_server_playground.util
 import java.sql.PreparedStatement
 import java.util.UUID
 
-import scalikejdbc.{ParameterBinderFactory, ParameterBinderWithValue}
-import spray.json.{JsString, JsValue, JsonFormat}
+import scalikejdbc.{ ParameterBinderFactory, ParameterBinderWithValue }
+import spray.json.{ JsString, JsValue, JsonFormat }
 
 object UUID4pg {
 

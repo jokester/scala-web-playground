@@ -12,7 +12,7 @@ trait WsInterface {
 
   import UserMessage._
   import ServerMessage._
-  import CommonStruct._
+  import Internal._
 
   def retrieveCompleteMessage(msg: Message)(implicit m: Materializer): Future[TextMessage.Strict] = {
     implicit val ctx: ExecutionContext = m.executionContext
@@ -27,7 +27,7 @@ trait WsInterface {
     }
   }
 
-  def extractCmd(m: String): Either[Throwable, (Json, chat2Command)] = {
+  def extractCmd(m: String): Either[Throwable, (Json, chatroomCommand)] = {
     import circe.parser._
     for (
       json <- parse(m);
@@ -64,24 +64,24 @@ trait WsInterface {
   private implicit def convert(msg: ServerMessage.Pong): Json = {
     ServerPong.encodeServerPong(
       ServerPong(
-        chat2Command("Pong", msg.seq)))
+        chatroomCommand("Pong", msg.seq)))
   }
 
   private implicit def convert(msg: ServerMessage.Authed): Json = {
     ServerAuthed.encodeServerAuthed(
       ServerAuthed(
-        chat2Command("Authed", msg.seq),
+        chatroomCommand("Authed", msg.seq),
         msg.identity))
   }
 
   private implicit def convert(msg: ServerMessage.Fail): Json = {
     ServerBaseRes.encodeServerBaseRes(
       ServerBaseRes(
-        chat2Command("Fail", msg.seq, Some(msg.errors.toIndexedSeq))))
+        chatroomCommand("Fail", msg.seq, Some(msg.errors.toIndexedSeq))))
   }
 
-  private implicit def convert(userInfo: CommonStruct.UserInfo): chat2UserInfo = {
-    chat2UserInfo(userInfo.name, userInfo.uuid.toString)
+  private implicit def convert(userInfo: Internal.UserInfo): chatroomUserInfo = {
+    chatroomUserInfo(userInfo.name, userInfo.uuid.toString)
   }
 
 }

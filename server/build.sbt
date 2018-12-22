@@ -68,7 +68,7 @@ flywayPassword in Test := testDb.getString("password")
 
 guardrailTasks in Compile := List(
   // Server(file("../api/src/v1-api.swagger.json"), pkg="io.jokester.learning.scala_server.api_v1", tracing=false),
-  Server(file("../api/src/chat2.swagger.json"), pkg="io.jokester.learning.scala_server.chat2", tracing=false)
+  Server(file("../api/src/chatroom.swagger.json"), pkg="io.jokester.scala_server_playground.chatroom", tracing=false)
 )
 
 enablePlugins(ScalikejdbcPlugin)

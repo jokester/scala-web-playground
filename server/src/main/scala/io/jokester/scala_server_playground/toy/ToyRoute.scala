@@ -1,12 +1,11 @@
 package io.jokester.scala_server_playground.toy
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCode}
-import akka.http.scaladsl.server.Directives.{complete, get, path}
+import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, StatusCode }
+import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.directives.BasicDirectives
 import com.typesafe.scalalogging.LazyLogging
 
-object ToyRoute extends BasicDirectives with LazyLogging {
+object ToyRoute extends LazyLogging {
 
   val helloRoute: Route =
     path("hello") {

@@ -1,13 +1,11 @@
-# akka-server-playground
+# scala-server-playground
 
 a playground for scala/akka server
 
 ## chat-room
 
-- ChatRoom
-- akka-based server (http / websocket)
-- react.js web UI
-- swagger codegen (guardrail)
+- websocket chat room
+- web UI made with React + MUI
 
 ## hanhuazu
 

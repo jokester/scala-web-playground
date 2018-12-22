@@ -1,6 +1,6 @@
 package io.jokester.scala_server_playground.blob
 
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.{ ByteArrayInputStream, InputStream }
 import java.nio.ByteBuffer
 import java.util.UUID
 

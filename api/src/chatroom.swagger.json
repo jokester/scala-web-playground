@@ -14,16 +14,173 @@
   "produces": [
     "application/json"
   ],
-  "paths": {},
+  "paths": {
+    "/not-used/chat2.Auth": {
+      "post": {
+        "operationId": "Auth",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ServerAuthed"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserAuth"
+            }
+          }
+        ],
+        "tags": [
+          "DummyChat2Service"
+        ]
+      }
+    },
+    "/not-used/chat2.Broadcast": {
+      "post": {
+        "operationId": "Broadcast",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ServerBroadcast"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserBaseReq"
+            }
+          }
+        ],
+        "tags": [
+          "DummyChat2Service"
+        ]
+      }
+    },
+    "/not-used/chat2.JoinChannel": {
+      "post": {
+        "operationId": "JoinChannel",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ServerJoinedChannel"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserJoinChannel"
+            }
+          }
+        ],
+        "tags": [
+          "DummyChat2Service"
+        ]
+      }
+    },
+    "/not-used/chat2.LeaveChannel": {
+      "post": {
+        "operationId": "LeaveChannel",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ServerLeftChannel"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserLeaveChannel"
+            }
+          }
+        ],
+        "tags": [
+          "DummyChat2Service"
+        ]
+      }
+    },
+    "/not-used/chat2.PingPong": {
+      "post": {
+        "operationId": "PingPong",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ServerPong"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserPing"
+            }
+          }
+        ],
+        "tags": [
+          "DummyChat2Service"
+        ]
+      }
+    },
+    "/not-used/chat2.SendChat": {
+      "post": {
+        "operationId": "SendChat",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ServerSentChat"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserSendChat"
+            }
+          }
+        ],
+        "tags": [
+          "DummyChat2Service"
+        ]
+      }
+    }
+  },
   "definitions": {
     "ServerAuthed": {
       "type": "object",
       "properties": {
         "cmd": {
-          "$ref": "#/definitions/scala_server_playgroundCommand"
+          "$ref": "#/definitions/chatroomCommand"
         },
         "identity": {
-          "$ref": "#/definitions/scala_server_playgroundUserInfo"
+          "$ref": "#/definitions/chatroomUserInfo"
         }
       },
       "required": [
@@ -35,7 +192,7 @@
       "type": "object",
       "properties": {
         "cmd": {
-          "$ref": "#/definitions/scala_server_playgroundCommand"
+          "$ref": "#/definitions/chatroomCommand"
         }
       },
       "required": [
@@ -46,18 +203,18 @@
       "type": "object",
       "properties": {
         "cmd": {
-          "$ref": "#/definitions/scala_server_playgroundCommand"
+          "$ref": "#/definitions/chatroomCommand"
         },
         "channels": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/scala_server_playgroundChannelInfo"
+            "$ref": "#/definitions/chatroomChannelInfo"
           }
         },
         "messages": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/scala_server_playgroundChatMessage"
+            "$ref": "#/definitions/chatroomChatMessage"
           }
         }
       },
@@ -71,15 +228,15 @@
       "type": "object",
       "properties": {
         "cmd": {
-          "$ref": "#/definitions/scala_server_playgroundCommand"
+          "$ref": "#/definitions/chatroomCommand"
         },
         "channel": {
-          "$ref": "#/definitions/scala_server_playgroundChannelInfo"
+          "$ref": "#/definitions/chatroomChannelInfo"
         },
         "history": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/scala_server_playgroundChatMessage"
+            "$ref": "#/definitions/chatroomChatMessage"
           }
         }
       },
@@ -93,7 +250,7 @@
       "type": "object",
       "properties": {
         "cmd": {
-          "$ref": "#/definitions/scala_server_playgroundCommand"
+          "$ref": "#/definitions/chatroomCommand"
         },
         "reason": {
           "type": "string"
@@ -108,7 +265,7 @@
       "type": "object",
       "properties": {
         "cmd": {
-          "$ref": "#/definitions/scala_server_playgroundCommand"
+          "$ref": "#/definitions/chatroomCommand"
         }
       },
       "required": [
@@ -119,10 +276,10 @@
       "type": "object",
       "properties": {
         "cmd": {
-          "$ref": "#/definitions/scala_server_playgroundCommand"
+          "$ref": "#/definitions/chatroomCommand"
         },
         "msg": {
-          "$ref": "#/definitions/scala_server_playgroundChatMessage"
+          "$ref": "#/definitions/chatroomChatMessage"
         }
       },
       "required": [
@@ -130,7 +287,97 @@
         "msg"
       ]
     },
-    "scala_server_playgroundChannelInfo": {
+    "UserAuth": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chatroomCommand"
+        },
+        "name": {
+          "type": "string"
+        },
+        "otp": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cmd",
+        "name",
+        "otp"
+      ]
+    },
+    "UserBaseReq": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chatroomCommand"
+        }
+      },
+      "required": [
+        "cmd"
+      ]
+    },
+    "UserJoinChannel": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chatroomCommand"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cmd",
+        "name"
+      ]
+    },
+    "UserLeaveChannel": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chatroomCommand"
+        },
+        "channelUuid": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cmd",
+        "channelUuid"
+      ]
+    },
+    "UserPing": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chatroomCommand"
+        }
+      },
+      "required": [
+        "cmd"
+      ]
+    },
+    "UserSendChat": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chatroomCommand"
+        },
+        "channelUuid": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cmd",
+        "channelUuid",
+        "text"
+      ]
+    },
+    "chatroomChannelInfo": {
       "type": "object",
       "properties": {
         "name": {
@@ -142,7 +389,7 @@
         "users": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/scala_server_playgroundUserInfo"
+            "$ref": "#/definitions/chatroomUserInfo"
           }
         }
       },
@@ -151,7 +398,7 @@
         "uuid"
       ]
     },
-    "scala_server_playgroundChatMessage": {
+    "chatroomChatMessage": {
       "type": "object",
       "properties": {
         "uuid": {
@@ -178,7 +425,7 @@
         "text"
       ]
     },
-    "scala_server_playgroundCommand": {
+    "chatroomCommand": {
       "type": "object",
       "properties": {
         "method": {
@@ -202,7 +449,7 @@
         "seq"
       ]
     },
-    "scala_server_playgroundUserInfo": {
+    "chatroomUserInfo": {
       "type": "object",
       "properties": {
         "name": {

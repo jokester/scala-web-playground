@@ -81,63 +81,63 @@ export class RequiredError extends Error {
 /**
  * 
  * @export
- * @interface ScalaServerPlaygroundChannelInfo
+ * @interface ChatroomChannelInfo
  */
-export interface ScalaServerPlaygroundChannelInfo {
+export interface ChatroomChannelInfo {
     /**
      * 
      * @type {string}
-     * @memberof ScalaServerPlaygroundChannelInfo
+     * @memberof ChatroomChannelInfo
      */
     name: string;
     /**
      * 
      * @type {string}
-     * @memberof ScalaServerPlaygroundChannelInfo
+     * @memberof ChatroomChannelInfo
      */
     uuid: string;
     /**
      * 
-     * @type {Array&lt;ScalaServerPlaygroundUserInfo&gt;}
-     * @memberof ScalaServerPlaygroundChannelInfo
+     * @type {Array&lt;ChatroomUserInfo&gt;}
+     * @memberof ChatroomChannelInfo
      */
-    users?: Array<ScalaServerPlaygroundUserInfo>;
+    users?: Array<ChatroomUserInfo>;
 }
 
 /**
  * 
  * @export
- * @interface ScalaServerPlaygroundChatMessage
+ * @interface ChatroomChatMessage
  */
-export interface ScalaServerPlaygroundChatMessage {
+export interface ChatroomChatMessage {
     /**
      * 
      * @type {string}
-     * @memberof ScalaServerPlaygroundChatMessage
+     * @memberof ChatroomChatMessage
      */
     uuid?: string;
     /**
      * 
      * @type {string}
-     * @memberof ScalaServerPlaygroundChatMessage
+     * @memberof ChatroomChatMessage
      */
     userUuid: string;
     /**
      * 
      * @type {string}
-     * @memberof ScalaServerPlaygroundChatMessage
+     * @memberof ChatroomChatMessage
      */
     channelUuid: string;
     /**
      * 
      * @type {string}
-     * @memberof ScalaServerPlaygroundChatMessage
+     * @memberof ChatroomChatMessage
      */
     text: string;
     /**
      * 
      * @type {string}
-     * @memberof ScalaServerPlaygroundChatMessage
+     * @memberof ChatroomChatMessage
      */
     timestamp: string;
 }
@@ -145,25 +145,25 @@ export interface ScalaServerPlaygroundChatMessage {
 /**
  * 
  * @export
- * @interface ScalaServerPlaygroundCommand
+ * @interface ChatroomCommand
  */
-export interface ScalaServerPlaygroundCommand {
+export interface ChatroomCommand {
     /**
      * 
      * @type {string}
-     * @memberof ScalaServerPlaygroundCommand
+     * @memberof ChatroomCommand
      */
     method: string;
     /**
      * 
      * @type {number}
-     * @memberof ScalaServerPlaygroundCommand
+     * @memberof ChatroomCommand
      */
     seq: number;
     /**
      * 
      * @type {Array&lt;string&gt;}
-     * @memberof ScalaServerPlaygroundCommand
+     * @memberof ChatroomCommand
      */
     errors?: Array<string>;
 }
@@ -171,19 +171,19 @@ export interface ScalaServerPlaygroundCommand {
 /**
  * 
  * @export
- * @interface ScalaServerPlaygroundUserInfo
+ * @interface ChatroomUserInfo
  */
-export interface ScalaServerPlaygroundUserInfo {
+export interface ChatroomUserInfo {
     /**
      * 
      * @type {string}
-     * @memberof ScalaServerPlaygroundUserInfo
+     * @memberof ChatroomUserInfo
      */
     name: string;
     /**
      * 
      * @type {string}
-     * @memberof ScalaServerPlaygroundUserInfo
+     * @memberof ChatroomUserInfo
      */
     uuid: string;
 }
@@ -196,16 +196,16 @@ export interface ScalaServerPlaygroundUserInfo {
 export interface ServerAuthed {
     /**
      * 
-     * @type {ScalaServerPlaygroundCommand}
+     * @type {ChatroomCommand}
      * @memberof ServerAuthed
      */
-    cmd: ScalaServerPlaygroundCommand;
+    cmd: ChatroomCommand;
     /**
      * 
-     * @type {ScalaServerPlaygroundUserInfo}
+     * @type {ChatroomUserInfo}
      * @memberof ServerAuthed
      */
-    identity: ScalaServerPlaygroundUserInfo;
+    identity: ChatroomUserInfo;
 }
 
 /**
@@ -216,10 +216,10 @@ export interface ServerAuthed {
 export interface ServerBaseRes {
     /**
      * 
-     * @type {ScalaServerPlaygroundCommand}
+     * @type {ChatroomCommand}
      * @memberof ServerBaseRes
      */
-    cmd: ScalaServerPlaygroundCommand;
+    cmd: ChatroomCommand;
 }
 
 /**
@@ -230,22 +230,22 @@ export interface ServerBaseRes {
 export interface ServerBroadcast {
     /**
      * 
-     * @type {ScalaServerPlaygroundCommand}
+     * @type {ChatroomCommand}
      * @memberof ServerBroadcast
      */
-    cmd?: ScalaServerPlaygroundCommand;
+    cmd?: ChatroomCommand;
     /**
      * 
-     * @type {Array&lt;ScalaServerPlaygroundChannelInfo&gt;}
+     * @type {Array&lt;ChatroomChannelInfo&gt;}
      * @memberof ServerBroadcast
      */
-    channels: Array<ScalaServerPlaygroundChannelInfo>;
+    channels: Array<ChatroomChannelInfo>;
     /**
      * 
-     * @type {Array&lt;ScalaServerPlaygroundChatMessage&gt;}
+     * @type {Array&lt;ChatroomChatMessage&gt;}
      * @memberof ServerBroadcast
      */
-    messages: Array<ScalaServerPlaygroundChatMessage>;
+    messages: Array<ChatroomChatMessage>;
 }
 
 /**
@@ -256,22 +256,22 @@ export interface ServerBroadcast {
 export interface ServerJoinedChannel {
     /**
      * 
-     * @type {ScalaServerPlaygroundCommand}
+     * @type {ChatroomCommand}
      * @memberof ServerJoinedChannel
      */
-    cmd: ScalaServerPlaygroundCommand;
+    cmd: ChatroomCommand;
     /**
      * 
-     * @type {ScalaServerPlaygroundChannelInfo}
+     * @type {ChatroomChannelInfo}
      * @memberof ServerJoinedChannel
      */
-    channel: ScalaServerPlaygroundChannelInfo;
+    channel: ChatroomChannelInfo;
     /**
      * 
-     * @type {Array&lt;ScalaServerPlaygroundChatMessage&gt;}
+     * @type {Array&lt;ChatroomChatMessage&gt;}
      * @memberof ServerJoinedChannel
      */
-    history: Array<ScalaServerPlaygroundChatMessage>;
+    history: Array<ChatroomChatMessage>;
 }
 
 /**
@@ -282,10 +282,10 @@ export interface ServerJoinedChannel {
 export interface ServerLeftChannel {
     /**
      * 
-     * @type {ScalaServerPlaygroundCommand}
+     * @type {ChatroomCommand}
      * @memberof ServerLeftChannel
      */
-    cmd: ScalaServerPlaygroundCommand;
+    cmd: ChatroomCommand;
     /**
      * 
      * @type {string}
@@ -302,10 +302,10 @@ export interface ServerLeftChannel {
 export interface ServerPong {
     /**
      * 
-     * @type {ScalaServerPlaygroundCommand}
+     * @type {ChatroomCommand}
      * @memberof ServerPong
      */
-    cmd: ScalaServerPlaygroundCommand;
+    cmd: ChatroomCommand;
 }
 
 /**
@@ -316,16 +316,586 @@ export interface ServerPong {
 export interface ServerSentChat {
     /**
      * 
-     * @type {ScalaServerPlaygroundCommand}
+     * @type {ChatroomCommand}
      * @memberof ServerSentChat
      */
-    cmd: ScalaServerPlaygroundCommand;
+    cmd: ChatroomCommand;
     /**
      * 
-     * @type {ScalaServerPlaygroundChatMessage}
+     * @type {ChatroomChatMessage}
      * @memberof ServerSentChat
      */
-    msg: ScalaServerPlaygroundChatMessage;
+    msg: ChatroomChatMessage;
 }
 
+/**
+ * 
+ * @export
+ * @interface UserAuth
+ */
+export interface UserAuth {
+    /**
+     * 
+     * @type {ChatroomCommand}
+     * @memberof UserAuth
+     */
+    cmd: ChatroomCommand;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserAuth
+     */
+    name: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserAuth
+     */
+    otp: string;
+}
+
+/**
+ * 
+ * @export
+ * @interface UserBaseReq
+ */
+export interface UserBaseReq {
+    /**
+     * 
+     * @type {ChatroomCommand}
+     * @memberof UserBaseReq
+     */
+    cmd: ChatroomCommand;
+}
+
+/**
+ * 
+ * @export
+ * @interface UserJoinChannel
+ */
+export interface UserJoinChannel {
+    /**
+     * 
+     * @type {ChatroomCommand}
+     * @memberof UserJoinChannel
+     */
+    cmd: ChatroomCommand;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserJoinChannel
+     */
+    name: string;
+}
+
+/**
+ * 
+ * @export
+ * @interface UserLeaveChannel
+ */
+export interface UserLeaveChannel {
+    /**
+     * 
+     * @type {ChatroomCommand}
+     * @memberof UserLeaveChannel
+     */
+    cmd: ChatroomCommand;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserLeaveChannel
+     */
+    channelUuid: string;
+}
+
+/**
+ * 
+ * @export
+ * @interface UserPing
+ */
+export interface UserPing {
+    /**
+     * 
+     * @type {ChatroomCommand}
+     * @memberof UserPing
+     */
+    cmd: ChatroomCommand;
+}
+
+/**
+ * 
+ * @export
+ * @interface UserSendChat
+ */
+export interface UserSendChat {
+    /**
+     * 
+     * @type {ChatroomCommand}
+     * @memberof UserSendChat
+     */
+    cmd: ChatroomCommand;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserSendChat
+     */
+    channelUuid: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserSendChat
+     */
+    text: string;
+}
+
+
+/**
+ * DummyChat2ServiceApi - fetch parameter creator
+ * @export
+ */
+export const DummyChat2ServiceApiFetchParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {UserAuth} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        auth(body: UserAuth, options: any = {}): FetchArgs {
+            // verify required parameter 'body' is not null or undefined
+            if (body === null || body === undefined) {
+                throw new RequiredError('body','Required parameter body was null or undefined when calling auth.');
+            }
+            const localVarPath = `/not-used/chat2.Auth`;
+            const localVarUrlObj = url.parse(localVarPath, true);
+            const localVarRequestOptions = Object.assign({ method: 'POST' }, options);
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            localVarUrlObj.query = Object.assign({}, localVarUrlObj.query, localVarQueryParameter, options.query);
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            localVarRequestOptions.headers = Object.assign({}, localVarHeaderParameter, options.headers);
+            const needsSerialization = (<any>"UserAuth" !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.body =  needsSerialization ? JSON.stringify(body || {}) : (body || "");
+
+            return {
+                url: url.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {UserBaseReq} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        broadcast(body: UserBaseReq, options: any = {}): FetchArgs {
+            // verify required parameter 'body' is not null or undefined
+            if (body === null || body === undefined) {
+                throw new RequiredError('body','Required parameter body was null or undefined when calling broadcast.');
+            }
+            const localVarPath = `/not-used/chat2.Broadcast`;
+            const localVarUrlObj = url.parse(localVarPath, true);
+            const localVarRequestOptions = Object.assign({ method: 'POST' }, options);
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            localVarUrlObj.query = Object.assign({}, localVarUrlObj.query, localVarQueryParameter, options.query);
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            localVarRequestOptions.headers = Object.assign({}, localVarHeaderParameter, options.headers);
+            const needsSerialization = (<any>"UserBaseReq" !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.body =  needsSerialization ? JSON.stringify(body || {}) : (body || "");
+
+            return {
+                url: url.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {UserJoinChannel} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        joinChannel(body: UserJoinChannel, options: any = {}): FetchArgs {
+            // verify required parameter 'body' is not null or undefined
+            if (body === null || body === undefined) {
+                throw new RequiredError('body','Required parameter body was null or undefined when calling joinChannel.');
+            }
+            const localVarPath = `/not-used/chat2.JoinChannel`;
+            const localVarUrlObj = url.parse(localVarPath, true);
+            const localVarRequestOptions = Object.assign({ method: 'POST' }, options);
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            localVarUrlObj.query = Object.assign({}, localVarUrlObj.query, localVarQueryParameter, options.query);
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            localVarRequestOptions.headers = Object.assign({}, localVarHeaderParameter, options.headers);
+            const needsSerialization = (<any>"UserJoinChannel" !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.body =  needsSerialization ? JSON.stringify(body || {}) : (body || "");
+
+            return {
+                url: url.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {UserLeaveChannel} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        leaveChannel(body: UserLeaveChannel, options: any = {}): FetchArgs {
+            // verify required parameter 'body' is not null or undefined
+            if (body === null || body === undefined) {
+                throw new RequiredError('body','Required parameter body was null or undefined when calling leaveChannel.');
+            }
+            const localVarPath = `/not-used/chat2.LeaveChannel`;
+            const localVarUrlObj = url.parse(localVarPath, true);
+            const localVarRequestOptions = Object.assign({ method: 'POST' }, options);
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            localVarUrlObj.query = Object.assign({}, localVarUrlObj.query, localVarQueryParameter, options.query);
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            localVarRequestOptions.headers = Object.assign({}, localVarHeaderParameter, options.headers);
+            const needsSerialization = (<any>"UserLeaveChannel" !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.body =  needsSerialization ? JSON.stringify(body || {}) : (body || "");
+
+            return {
+                url: url.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {UserPing} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        pingPong(body: UserPing, options: any = {}): FetchArgs {
+            // verify required parameter 'body' is not null or undefined
+            if (body === null || body === undefined) {
+                throw new RequiredError('body','Required parameter body was null or undefined when calling pingPong.');
+            }
+            const localVarPath = `/not-used/chat2.PingPong`;
+            const localVarUrlObj = url.parse(localVarPath, true);
+            const localVarRequestOptions = Object.assign({ method: 'POST' }, options);
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            localVarUrlObj.query = Object.assign({}, localVarUrlObj.query, localVarQueryParameter, options.query);
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            localVarRequestOptions.headers = Object.assign({}, localVarHeaderParameter, options.headers);
+            const needsSerialization = (<any>"UserPing" !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.body =  needsSerialization ? JSON.stringify(body || {}) : (body || "");
+
+            return {
+                url: url.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {UserSendChat} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendChat(body: UserSendChat, options: any = {}): FetchArgs {
+            // verify required parameter 'body' is not null or undefined
+            if (body === null || body === undefined) {
+                throw new RequiredError('body','Required parameter body was null or undefined when calling sendChat.');
+            }
+            const localVarPath = `/not-used/chat2.SendChat`;
+            const localVarUrlObj = url.parse(localVarPath, true);
+            const localVarRequestOptions = Object.assign({ method: 'POST' }, options);
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            localVarUrlObj.query = Object.assign({}, localVarUrlObj.query, localVarQueryParameter, options.query);
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            localVarRequestOptions.headers = Object.assign({}, localVarHeaderParameter, options.headers);
+            const needsSerialization = (<any>"UserSendChat" !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.body =  needsSerialization ? JSON.stringify(body || {}) : (body || "");
+
+            return {
+                url: url.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * DummyChat2ServiceApi - functional programming interface
+ * @export
+ */
+export const DummyChat2ServiceApiFp = function(configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {UserAuth} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        auth(body: UserAuth, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<ServerAuthed> {
+            const localVarFetchArgs = DummyChat2ServiceApiFetchParamCreator(configuration).auth(body, options);
+            return (fetch: FetchAPI = portableFetch, basePath: string = BASE_PATH) => {
+                return fetch(basePath + localVarFetchArgs.url, localVarFetchArgs.options).then((response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        return response.json();
+                    } else {
+                        throw response;
+                    }
+                });
+            };
+        },
+        /**
+         * 
+         * @param {UserBaseReq} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        broadcast(body: UserBaseReq, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<ServerBroadcast> {
+            const localVarFetchArgs = DummyChat2ServiceApiFetchParamCreator(configuration).broadcast(body, options);
+            return (fetch: FetchAPI = portableFetch, basePath: string = BASE_PATH) => {
+                return fetch(basePath + localVarFetchArgs.url, localVarFetchArgs.options).then((response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        return response.json();
+                    } else {
+                        throw response;
+                    }
+                });
+            };
+        },
+        /**
+         * 
+         * @param {UserJoinChannel} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        joinChannel(body: UserJoinChannel, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<ServerJoinedChannel> {
+            const localVarFetchArgs = DummyChat2ServiceApiFetchParamCreator(configuration).joinChannel(body, options);
+            return (fetch: FetchAPI = portableFetch, basePath: string = BASE_PATH) => {
+                return fetch(basePath + localVarFetchArgs.url, localVarFetchArgs.options).then((response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        return response.json();
+                    } else {
+                        throw response;
+                    }
+                });
+            };
+        },
+        /**
+         * 
+         * @param {UserLeaveChannel} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        leaveChannel(body: UserLeaveChannel, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<ServerLeftChannel> {
+            const localVarFetchArgs = DummyChat2ServiceApiFetchParamCreator(configuration).leaveChannel(body, options);
+            return (fetch: FetchAPI = portableFetch, basePath: string = BASE_PATH) => {
+                return fetch(basePath + localVarFetchArgs.url, localVarFetchArgs.options).then((response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        return response.json();
+                    } else {
+                        throw response;
+                    }
+                });
+            };
+        },
+        /**
+         * 
+         * @param {UserPing} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        pingPong(body: UserPing, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<ServerPong> {
+            const localVarFetchArgs = DummyChat2ServiceApiFetchParamCreator(configuration).pingPong(body, options);
+            return (fetch: FetchAPI = portableFetch, basePath: string = BASE_PATH) => {
+                return fetch(basePath + localVarFetchArgs.url, localVarFetchArgs.options).then((response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        return response.json();
+                    } else {
+                        throw response;
+                    }
+                });
+            };
+        },
+        /**
+         * 
+         * @param {UserSendChat} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendChat(body: UserSendChat, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<ServerSentChat> {
+            const localVarFetchArgs = DummyChat2ServiceApiFetchParamCreator(configuration).sendChat(body, options);
+            return (fetch: FetchAPI = portableFetch, basePath: string = BASE_PATH) => {
+                return fetch(basePath + localVarFetchArgs.url, localVarFetchArgs.options).then((response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        return response.json();
+                    } else {
+                        throw response;
+                    }
+                });
+            };
+        },
+    }
+};
+
+/**
+ * DummyChat2ServiceApi - factory interface
+ * @export
+ */
+export const DummyChat2ServiceApiFactory = function (configuration?: Configuration, fetch?: FetchAPI, basePath?: string) {
+    return {
+        /**
+         * 
+         * @param {UserAuth} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        auth(body: UserAuth, options?: any) {
+            return DummyChat2ServiceApiFp(configuration).auth(body, options)(fetch, basePath);
+        },
+        /**
+         * 
+         * @param {UserBaseReq} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        broadcast(body: UserBaseReq, options?: any) {
+            return DummyChat2ServiceApiFp(configuration).broadcast(body, options)(fetch, basePath);
+        },
+        /**
+         * 
+         * @param {UserJoinChannel} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        joinChannel(body: UserJoinChannel, options?: any) {
+            return DummyChat2ServiceApiFp(configuration).joinChannel(body, options)(fetch, basePath);
+        },
+        /**
+         * 
+         * @param {UserLeaveChannel} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        leaveChannel(body: UserLeaveChannel, options?: any) {
+            return DummyChat2ServiceApiFp(configuration).leaveChannel(body, options)(fetch, basePath);
+        },
+        /**
+         * 
+         * @param {UserPing} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        pingPong(body: UserPing, options?: any) {
+            return DummyChat2ServiceApiFp(configuration).pingPong(body, options)(fetch, basePath);
+        },
+        /**
+         * 
+         * @param {UserSendChat} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendChat(body: UserSendChat, options?: any) {
+            return DummyChat2ServiceApiFp(configuration).sendChat(body, options)(fetch, basePath);
+        },
+    };
+};
+
+/**
+ * DummyChat2ServiceApi - object-oriented interface
+ * @export
+ * @class DummyChat2ServiceApi
+ * @extends {BaseAPI}
+ */
+export class DummyChat2ServiceApi extends BaseAPI {
+    /**
+     * 
+     * @param {} body 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DummyChat2ServiceApi
+     */
+    public auth(body: UserAuth, options?: any) {
+        return DummyChat2ServiceApiFp(this.configuration).auth(body, options)(this.fetch, this.basePath);
+    }
+
+    /**
+     * 
+     * @param {} body 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DummyChat2ServiceApi
+     */
+    public broadcast(body: UserBaseReq, options?: any) {
+        return DummyChat2ServiceApiFp(this.configuration).broadcast(body, options)(this.fetch, this.basePath);
+    }
+
+    /**
+     * 
+     * @param {} body 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DummyChat2ServiceApi
+     */
+    public joinChannel(body: UserJoinChannel, options?: any) {
+        return DummyChat2ServiceApiFp(this.configuration).joinChannel(body, options)(this.fetch, this.basePath);
+    }
+
+    /**
+     * 
+     * @param {} body 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DummyChat2ServiceApi
+     */
+    public leaveChannel(body: UserLeaveChannel, options?: any) {
+        return DummyChat2ServiceApiFp(this.configuration).leaveChannel(body, options)(this.fetch, this.basePath);
+    }
+
+    /**
+     * 
+     * @param {} body 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DummyChat2ServiceApi
+     */
+    public pingPong(body: UserPing, options?: any) {
+        return DummyChat2ServiceApiFp(this.configuration).pingPong(body, options)(this.fetch, this.basePath);
+    }
+
+    /**
+     * 
+     * @param {} body 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DummyChat2ServiceApi
+     */
+    public sendChat(body: UserSendChat, options?: any) {
+        return DummyChat2ServiceApiFp(this.configuration).sendChat(body, options)(this.fetch, this.basePath);
+    }
+
+}
 

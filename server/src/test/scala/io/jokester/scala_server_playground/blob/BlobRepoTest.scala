@@ -1,14 +1,12 @@
-package io.jokester.learning.scala_server.db
+package io.jokester.scala_server_playground.blob
 
 import java.nio.ByteBuffer
 import java.util.Random
 
-import io.jokester.scala_server_playground.hello.repo.{Blob, BlobRepoImpl}
-import io.jokester.learning.scala_server.util.ControlledEntropy
-import io.jokester.scala_server_playground.util.{ControlledEntropy, Entropy}
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
+import io.jokester.scala_server_playground.util.{ ControlledEntropy, Entropy }
+import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
 import scalikejdbc.config.DBs
-import scalikejdbc.{ConnectionPool, DB}
+import scalikejdbc.{ ConnectionPool, DB }
 
 class BlobRepoTest extends WordSpec with Matchers with BeforeAndAfterAll {
 
@@ -16,7 +14,7 @@ class BlobRepoTest extends WordSpec with Matchers with BeforeAndAfterAll {
     DBs.setupAll()
     val cPool = ConnectionPool('test)
     implicit val entropy: Entropy = new ControlledEntropy(new Random)
-    val repo = new BlobRepoImpl(() => DB(cPool.borrow()))
+    val repo = new BlobRepoPG(() => DB(cPool.borrow()))
 
     "save and load blobs" in {
       val bytes = ByteBuffer.allocate(32)

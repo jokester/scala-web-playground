@@ -1,21 +1,21 @@
-package io.jokester.learning.scala_server
+package io.jokester.learning.scala_server.toy
 
-import org.scalatest.{ Matchers, WordSpec }
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.testkit.ScalatestRouteTest
+import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
-import Directives._
+import akka.http.scaladsl.testkit.ScalatestRouteTest
+import io.jokester.scala_server_playground.hello.HelloHandler
+import org.scalatest.{ Matchers, WordSpec }
 
 class HelloRouteTest extends WordSpec with Matchers with ScalatestRouteTest {
 
-  val route: Route = HelloRoute.helloRoute
+  val route: Route = (new HelloHandler).route
 
   "The service" should {
 
     "return a greeting for GET requests to the root path" in {
       // tests:
-      Get("/hello") ~> route ~> check {
-        responseAs[String] shouldEqual "not found"
+      Get("/") ~> route ~> check {
+        responseAs[String] shouldEqual "hello from HelloHandler"
       }
     }
 

@@ -1,0 +1,17 @@
+version: '2'
+
+volumes:
+  scala-server-pgsql-dev:
+  scala-server-redis-dev:
+
+services:
+  pgsql:
+    image: postgres:10.6-alpine
+    environment:
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - scala-server-pgsql-dev:/var/lib/postgresql/data
+    ports:
+      - 65432:5432
+    restart: always

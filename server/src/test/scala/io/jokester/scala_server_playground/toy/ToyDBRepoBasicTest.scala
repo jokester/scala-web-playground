@@ -1,19 +1,17 @@
-package io.jokester.learning.scala_server.toy
+package io.jokester.scala_server_playground.toy
 
-import io.jokester.scala_server_playground.hello.repo.ToyAction
-import io.jokester.scala_server_playground.toy.ToyDatabaseRepo
-import org.scalatest.{AsyncWordSpec, Matchers}
+import org.scalatest.{ AsyncWordSpec, Matchers }
 import scalikejdbc.config.DBs
-import scalikejdbc.{ConnectionPool, DB}
+import scalikejdbc.{ ConnectionPool, DB }
 
-class ToyDatabaseRepoTest extends AsyncWordSpec with Matchers {
+class ToyDBRepoBasicTest extends AsyncWordSpec with Matchers {
 
   DBs.setupAll
 
   "ToyDatabaseRepo" should {
     val cpool = ConnectionPool('default)
 
-    val repo = new ToyDatabaseRepo(() => DB(cpool.borrow))
+    val repo = new ToyDBRepoBasic(() => DB(cpool.borrow))
 
     "return last" in {
       val futureS1 = repo.getState

@@ -1,9 +1,13 @@
 #!/bin/bash
 
 set -uex
-TMP_JSON=$(mktemp)
-URL="http://localhost:18080/toy/reduceState"
 
-echo '{ "delta": 2 }' > $TMP_JSON
 
-exec ab -p "$TMP_JSON" -T application/json -c 100 -n 500 -r -k "$URL"
+for URL in \
+  '127.0.0.1:18080/toy/unsafe-mem/3' \
+  '127.0.0.1:18080/toy/sync-mem/3'   \
+  '127.0.0.1:18080/toy/db-basic/3'   \
+  '127.0.0.1:18080/toy/db-nolock/3'
+do
+  ab -m POST -n 2000 -c 100 -r -k "$URL"
+done

@@ -8,7 +8,7 @@ import io.jokester.scala_server_playground.util.Catch404
 
 class HelloHandler extends LazyLogging with Catch404 {
   def route: Route = {
-    (get & pathEnd) {
+    (get & pathEndOrSingleSlash) {
       logger.debug("hello")
       complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, "hello from HelloHandler"))
     } ~ catchUnmatched

@@ -86,7 +86,7 @@ trait WsInterface {
         chatroomCommand("JoinedChannel", joined.seq),
         channel = joined.channel,
         users = joined.users.toIndexedSeq.map(convert),
-        history = joined.history.toIndexedSeq.map(convert)
+        history = joined.messages.toIndexedSeq.map(convert)
       ),
     )
   }

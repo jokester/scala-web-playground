@@ -8,7 +8,7 @@ import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.stream.{Materializer, OverflowStrategy}
 import com.typesafe.scalalogging.LazyLogging
-import io.jokester.scala_server_playground.chatroom.actor.UserActor
+import io.jokester.scala_server_playground.chatroom.actor.{DaemonActor, UserActor}
 import io.jokester.scala_server_playground.util.Entropy
 
 /**
@@ -22,11 +22,11 @@ class ChatroomHandler(implicit system: ActorSystem, implicit val entropy: Entrop
 
   import Internal._
 
-  //  private lazy val manager = system.actorOf(Props[DaemonActor])
+  private lazy val daemon = system.actorOf(DaemonActor.props(entropy))
 
   def newUserFlow()(implicit m: Materializer): Flow[Message, Message, NotUsed] = {
 
-    val userActor = system.actorOf(UserActor.props(entropy.nextUUID()))
+    val userActor = system.actorOf(UserActor.props(entropy.nextUUID(), daemon))
 
     val incoming = Flow[Message]
       .mapAsync(1)(retrieveCompleteMessage)

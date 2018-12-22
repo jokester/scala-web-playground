@@ -26,4 +26,5 @@ export async function tryConnection() {
   const repo = new AppRepo(pipe);
   await repo.startConnect("nick");
   await repo.auth("otp");
+  await pipe.sink.joinChannel('chan1');
 }

@@ -12,7 +12,8 @@ object ServerMessage {
 
   case class Authed(seq: Int, identity: User) extends ToUser(seq)
 
-  case class JoinedChannel(seq: Int, channel: Channel, users: Seq[User], history: Seq[ChatMessage])
+  case class JoinedChannel(seq: Int, channel: Channel, users: Seq[User], messages: Seq[ChatMessage])
     extends ToUser(seq)
 
+  case class BroadCast(seq: Int, users: Seq[User], channels: Seq[Channel], messages: Seq[ChatMessage])
 }

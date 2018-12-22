@@ -9,18 +9,20 @@ import io.jokester.scala_server_playground.util.ActorLifecycleLogging
 object UserActor {
   // type-checked and by-value way to create Props
   // see https://blog.codecentric.de/en/2017/03/akka-best-practices-defining-actor-props/
-  def props(uuid: UUID) = Props(new UserActor(uuid))
+  def props(uuid: UUID, daemon: ActorRef) = Props(new UserActor(uuid, daemon))
 }
 
-class UserActor(uuid: UUID) extends Actor with ActorLogging with ActorLifecycleLogging {
+class UserActor(uuid: UUID, daemon: ActorRef) extends Actor with ActorLogging with ActorLifecycleLogging {
 
   import Internal._
   import ServerMessage._
   import UserMessage._
 
-  var joinedRooms = Map.empty[String, ActorRef]
-  var outgoing: Option[ActorRef] = None
-  var userInfo: Option[User] = None
+  private var nextServerSeq = -1
+  private var outgoing: Option[ActorRef] = None
+  private var userInfo: Option[User] = None
+  private var joiningRoom: Map[String, Int] = Map.empty
+  private var joinedRoom: Map[UUID, ActorRef] = Map.empty
 
   override def receive: Receive = wrapContext {
     case UserConnected(o) if outgoing.isEmpty =>
@@ -39,7 +41,20 @@ class UserActor(uuid: UUID) extends Actor with ActorLogging with ActorLifecycleL
   }
 
   private def authed: Receive = wrapContext {
-    case msg if msg == "EEE" =>
+    case UserMessage.JoinChannel(seq: Int, name: String) =>
+      joiningRoom += name -> seq
+      daemon ! JoinRequest(from = userInfo.get, name, self)
+    case b @ Broadcast(channel, users, messages) if joiningRoom.contains(channel.name) =>
+      outgoing.get ! JoinedChannel(joiningRoom(channel.name), channel, users, messages)
+      joinedRoom += channel.uuid -> sender
+      joiningRoom -= channel.name
+    case b @ Broadcast(channel, users, messages) if joinedRoom.contains(channel.uuid) =>
+      nextServerSeq -= 1
+      outgoing.get ! ServerMessage.BroadCast(
+        nextServerSeq,
+        users,
+        Seq(channel),
+        messages)
   }
 
   private def handlePing: Receive = {
@@ -56,6 +71,4 @@ class UserActor(uuid: UUID) extends Actor with ActorLogging with ActorLifecycleL
   private def wrapContext(inner: Receive): Receive = {
     handlePing orElse inner orElse catchUnhandledSeq
   }
-
-  private def in(room: String) = joinedRooms.contains(room)
 }

@@ -14,4 +14,7 @@ object Internal {
 
   case class ChatMessage(uuid: UUID, userUuid: UUID, channelUuid: UUID, text: String, timestamp: Date)
 
+  case class JoinRequest(from: User, channel: String, userActor: ActorRef)
+
+  case class Broadcast(from: Channel, users: Seq[User], messages: Seq[ChatMessage])
 }

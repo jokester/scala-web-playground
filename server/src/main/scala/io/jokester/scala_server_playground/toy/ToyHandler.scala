@@ -37,7 +37,7 @@ class ToyHandler(getDB: () => DB)(implicit e: ExecutionContext) {
   }
 
   def route: Route = {
-    path("unsafe-mem")(subroute(unsafeMemRepo)) ~
-      path("db")(subroute(dbRepo))
+    pathPrefix("unsafe-mem")(subroute(unsafeMemRepo)) ~
+      pathPrefix("db")(subroute(dbRepo))
   }
 }

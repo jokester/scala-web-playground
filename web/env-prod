@@ -1,0 +1,2 @@
+# vim: ft=sh
+export REACT_APP_str1=value

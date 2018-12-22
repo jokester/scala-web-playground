@@ -1,0 +1,105 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "src/v1-api.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/toy/readState": {
+      "get": {
+        "operationId": "ReadState",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ToyToyState"
+            }
+          }
+        },
+        "tags": [
+          "ToyApi"
+        ]
+      }
+    },
+    "/toy/reduceState": {
+      "post": {
+        "operationId": "ReduceState",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/ToyToyState"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ToyToyAction"
+            }
+          }
+        ],
+        "tags": [
+          "ToyApi"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "ServerMessagePong": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "$ref": "#/definitions/apiMessageTag"
+        }
+      }
+    },
+    "ToyToyAction": {
+      "type": "object",
+      "properties": {
+        "delta": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "ToyToyState": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "changedCount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "apiMessageTag": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "type": "string"
+        },
+        "nonce": {
+          "type": "string"
+        }
+      },
+      "title": "used to distinguish api calls / returns"
+    }
+  }
+}

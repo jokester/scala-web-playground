@@ -1,0 +1,133 @@
+syntax = "proto3";
+
+import "protoc-gen-swagger/options/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+
+package io.jokester.learning.scala_server.chat2;
+
+// used in all api calls / returns, to pair req/res messages
+message Command {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["method", "seq"] } };
+  string method = 1;
+  // user   initiated (e.g. command):   seqNo positive
+  // server initiated (e.g. broadcast): seqNo negative
+  int32    seq  = 2;
+  repeated string errors = 3;
+}
+
+message UserInfo {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["name", "uuid"] } };
+  string name = 1;
+  string uuid = 2;
+}
+
+message ChannelInfo {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["name", "uuid"] } };
+  string name = 1;
+  string uuid = 2;
+  repeated UserInfo users = 3;
+}
+
+message ChatMessage {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["timestamp", "userUuid", "channelUuid", "text"] } };
+  string uuid        = 9; // primary key
+  string userUuid    = 10;
+  string channelUuid = 12;
+  string text        = 13;
+  // grpc-gateway: int32 -> number@JS
+  // grpc-gateway: int64 -> string@JS
+  // guardrail:    int32 -> Int@Scala
+  // guardrail:    int64 -> int64 (error)
+  // so just use string (ISO8601)
+  string timestamp   = 14;
+}
+
+// messages from user
+message User {
+  message BaseReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd"] } };
+    Command cmd = 1;
+  }
+  message Ping {
+    // ping: same as BaseReq
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd"] } };
+    Command cmd = 1;
+  }
+  message Auth {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "name", "otp"] } };
+    Command cmd = 1;
+    string name = 2;
+    string otp = 3;
+  }
+  message JoinChannel {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "name"] } };
+    Command cmd = 1;
+    string name = 2;
+  }
+  message LeaveChannel {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "channelUuid"] } };
+    Command cmd         = 1;
+    string  channelUuid = 3;
+  }
+  message SendChat {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "channelUuid", "text"] } };
+    Command cmd         = 1;
+    string  channelUuid = 3;
+    string  text        = 4;
+  }
+}
+
+// messages from server
+message Server {
+  message BaseRes {
+    // (in case of )
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd"] } };
+    Command cmd = 1;
+  }
+  message Pong {
+    // pong: same as BaseRes
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd"] } };
+    Command cmd = 1;
+  }
+  message Authed {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "identity"] } };
+    Command  cmd      = 1;
+    UserInfo identity = 2;
+  }
+  message JoinedChannel {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "channel", "history"] } };
+    Command     cmd     = 1;
+    ChannelInfo channel = 2;
+    repeated ChatMessage history = 3;
+  }
+  message LeftChannel {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "reason"] } };
+    Command cmd    = 1;
+    string  reason = 2;
+  }
+  message SentChat {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "msg"] } };
+    Command     cmd = 1;
+    ChatMessage msg = 2;
+
+  }
+  message Broadcast {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["method", "channels", "messages"] } };
+    Command cmd = 1;
+    repeated ChannelInfo channels = 2;
+    repeated ChatMessage messages = 3;
+  }
+}
+
+// not used actually.
+// just need to cover all types to generate json encoder/decoder
+service DummyChat2Service {
+  rpc BaseFlow     (User.BaseReq)      returns (Server.BaseRes)       {}
+  rpc PingPong     (User.Ping)         returns (Server.Pong)          {}
+  rpc Auth         (User.Auth)         returns (Server.Authed)        {}
+  rpc JoinChannel  (User.JoinChannel)  returns (Server.JoinedChannel) {}
+  rpc LeaveChannel (User.LeaveChannel) returns (Server.LeftChannel)   {}
+  rpc SendChat     (User.SendChat)     returns (Server.SentChat)      {}
+  rpc Broadcast    (User.BaseReq)      returns (Server.Broadcast)     {}
+}

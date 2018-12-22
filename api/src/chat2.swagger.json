@@ -1,0 +1,468 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "src/chat2.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/not-used/chat2.Auth": {
+      "post": {
+        "operationId": "Auth",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ServerAuthed"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserAuth"
+            }
+          }
+        ],
+        "tags": [
+          "DummyChat2Service"
+        ]
+      }
+    },
+    "/not-used/chat2.Broadcast": {
+      "post": {
+        "operationId": "Broadcast",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ServerBroadcast"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserBaseReq"
+            }
+          }
+        ],
+        "tags": [
+          "DummyChat2Service"
+        ]
+      }
+    },
+    "/not-used/chat2.JoinChannel": {
+      "post": {
+        "operationId": "JoinChannel",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ServerJoinedChannel"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserJoinChannel"
+            }
+          }
+        ],
+        "tags": [
+          "DummyChat2Service"
+        ]
+      }
+    },
+    "/not-used/chat2.LeaveChannel": {
+      "post": {
+        "operationId": "LeaveChannel",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ServerLeftChannel"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserLeaveChannel"
+            }
+          }
+        ],
+        "tags": [
+          "DummyChat2Service"
+        ]
+      }
+    },
+    "/not-used/chat2.PingPong": {
+      "post": {
+        "operationId": "PingPong",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ServerPong"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserPing"
+            }
+          }
+        ],
+        "tags": [
+          "DummyChat2Service"
+        ]
+      }
+    },
+    "/not-used/chat2.SendChat": {
+      "post": {
+        "operationId": "SendChat",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ServerSentChat"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserSendChat"
+            }
+          }
+        ],
+        "tags": [
+          "DummyChat2Service"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "ServerAuthed": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chat2Command"
+        },
+        "identity": {
+          "$ref": "#/definitions/chat2UserInfo"
+        }
+      },
+      "required": [
+        "cmd",
+        "identity"
+      ]
+    },
+    "ServerBaseRes": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chat2Command"
+        }
+      },
+      "required": [
+        "cmd"
+      ]
+    },
+    "ServerBroadcast": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chat2Command"
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chat2ChannelInfo"
+          }
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chat2ChatMessage"
+          }
+        }
+      },
+      "required": [
+        "method",
+        "channels",
+        "messages"
+      ]
+    },
+    "ServerJoinedChannel": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chat2Command"
+        },
+        "channel": {
+          "$ref": "#/definitions/chat2ChannelInfo"
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chat2ChatMessage"
+          }
+        }
+      },
+      "required": [
+        "cmd",
+        "channel",
+        "history"
+      ]
+    },
+    "ServerLeftChannel": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chat2Command"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cmd",
+        "reason"
+      ]
+    },
+    "ServerPong": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chat2Command"
+        }
+      },
+      "required": [
+        "cmd"
+      ]
+    },
+    "ServerSentChat": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chat2Command"
+        },
+        "msg": {
+          "$ref": "#/definitions/chat2ChatMessage"
+        }
+      },
+      "required": [
+        "cmd",
+        "msg"
+      ]
+    },
+    "UserAuth": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chat2Command"
+        },
+        "name": {
+          "type": "string"
+        },
+        "otp": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cmd",
+        "name",
+        "otp"
+      ]
+    },
+    "UserBaseReq": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chat2Command"
+        }
+      },
+      "required": [
+        "cmd"
+      ]
+    },
+    "UserJoinChannel": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chat2Command"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cmd",
+        "name"
+      ]
+    },
+    "UserLeaveChannel": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chat2Command"
+        },
+        "channelUuid": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cmd",
+        "channelUuid"
+      ]
+    },
+    "UserPing": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chat2Command"
+        }
+      },
+      "required": [
+        "cmd"
+      ]
+    },
+    "UserSendChat": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "$ref": "#/definitions/chat2Command"
+        },
+        "channelUuid": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cmd",
+        "channelUuid",
+        "text"
+      ]
+    },
+    "chat2ChannelInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chat2UserInfo"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "uuid"
+      ]
+    },
+    "chat2ChatMessage": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "userUuid": {
+          "type": "string"
+        },
+        "channelUuid": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "title": "grpc-gateway: int32 -\u003e number@JS\ngrpc-gateway: int64 -\u003e string@JS\nguardrail:    int32 -\u003e Int@Scala\nguardrail:    int64 -\u003e int64 (error)\nso just use string (ISO8601)"
+        }
+      },
+      "required": [
+        "timestamp",
+        "userUuid",
+        "channelUuid",
+        "text"
+      ]
+    },
+    "chat2Command": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "seq": {
+          "type": "integer",
+          "format": "int32",
+          "title": "user   initiated (e.g. command):   seqNo positive\nserver initiated (e.g. broadcast): seqNo negative"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "used in all api calls / returns, to pair req/res messages",
+      "required": [
+        "method",
+        "seq"
+      ]
+    },
+    "chat2UserInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "uuid"
+      ]
+    }
+  }
+}

@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package io.jokester.learning.scala_server.api;
+
+import "google/protobuf/timestamp.proto";
+
+message Error {
+  repeated string messages = 1;
+}
+
+message Atom {
+  message Size2 {
+    float width = 1;
+    float height = 2;
+  }
+
+  message Position2 {
+    float x = 1;
+    float y = 2;
+  }
+
+}
+
+message Model {
+
+  message Blob {
+    string id = 1;
+    string contentType = 2;
+    string numBytes = 3;
+    Atom.Size2 size = 4;
+  }
+
+  message User {
+    string id = 1;
+    string name = 2;
+    google.protobuf.Timestamp createdAt = 3;
+    google.protobuf.Timestamp modifiedAt = 4;
+  }
+
+  message Session {
+    User user = 1;
+    string token = 2;
+  }
+
+  message Project {
+    string id = 1;
+    string title = 2;
+    int32 revision = 3;
+    google.protobuf.Timestamp createdAt = 4;
+    google.protobuf.Timestamp modifiedAt = 5;
+    repeated string pageIds = 6;
+  }
+
+  message Page {
+    string id = 1;
+    google.protobuf.Timestamp createdAt = 2;
+    google.protobuf.Timestamp modifiedAt = 3;
+    string title = 4;
+    string blobId = 5;
+  }
+
+  message Annotation {
+    string id = 1;
+    google.protobuf.Timestamp createdAt = 2;
+    google.protobuf.Timestamp modifiedAt = 3;
+  }
+
+}
+
+message Api {
+
+  message Empty {}
+  message GuestAuth {
+    message Res { Model.Page page = 1; Error error = 2; }
+  }
+
+  message Page {
+    message CreateReq { Model.Page page = 1; }
+    message UpdateReq { Model.Page page = 1; string pageId = 2; int32 oldRevision = 3; }
+    message ReadReq { string pageId = 1; }
+    message Res { Model.Page page = 1; Error error = 2; }
+  }
+
+}
+
+
+
+/* file uploading NOT SUPPORTED
+   message ImageFile {
+   bytes content = 1;
+   string contentType = 2;
+   }
+ */
+
+message Toy {
+  message ToyState {
+    int32 number = 1;
+    int32 changedCount = 2;
+  }
+
+  message ToyAction {
+    int32 delta = 1;
+  }
+}
+
+service ToyApi {
+  rpc ReadState (Api.Empty) returns (Toy.ToyState) {}
+  rpc ReduceState (Toy.ToyAction) returns (Toy.ToyState) {}
+}
+

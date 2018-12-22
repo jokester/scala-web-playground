@@ -1,0 +1,23 @@
+type: google.api.Service
+config_version: 3
+
+http:
+  rules:
+  - selector: io.jokester.learning.scala_server.chat2.DummyChat2Service.PingPong
+    post: /not-used/chat2.PingPong
+    body: "*"
+  - selector: io.jokester.learning.scala_server.chat2.DummyChat2Service.Auth
+    post: /not-used/chat2.Auth
+    body: "*"
+  - selector: io.jokester.learning.scala_server.chat2.DummyChat2Service.JoinChannel
+    post: /not-used/chat2.JoinChannel
+    body: "*"
+  - selector: io.jokester.learning.scala_server.chat2.DummyChat2Service.LeaveChannel
+    post: /not-used/chat2.LeaveChannel
+    body: "*"
+  - selector: io.jokester.learning.scala_server.chat2.DummyChat2Service.SendChat
+    post: /not-used/chat2.SendChat
+    body: "*"
+  - selector: io.jokester.learning.scala_server.chat2.DummyChat2Service.Broadcast
+    post: /not-used/chat2.Broadcast
+    body: "*"

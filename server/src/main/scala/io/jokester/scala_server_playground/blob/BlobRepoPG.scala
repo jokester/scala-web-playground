@@ -6,7 +6,7 @@ import java.util.UUID
 
 import com.google.common.io.ByteStreams
 import io.jokester.scala_server_playground.util.Entropy
-import scalikejdbc.{DB, ResultName, WrappedResultSet, _}
+import scalikejdbc.{ DB, ResultName, WrappedResultSet, _ }
 
 class BlobRepoPG(getDB: () => DB)(implicit e: Entropy) extends BlobRepo {
 
@@ -59,7 +59,6 @@ class BlobRepoPG(getDB: () => DB)(implicit e: Entropy) extends BlobRepo {
       contentType = rs.string("content_type"),
       numBytes = rs.int("len_bytes"))
   }
-
 
   def getBlobMeta(id: UUID): Option[BlobMeta] = {
     getDB() readOnly { implicit session =>

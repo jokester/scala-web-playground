@@ -1,19 +1,28 @@
 package io.jokester.scala_server_playground
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.server.{ HttpApp, Route }
+import akka.http.scaladsl.server.{HttpApp, Route}
 import io.jokester.scala_server_playground.chatroom.ChatroomHandler
-import io.jokester.scala_server_playground.blob.{ BlobHandler, BlobRepo, BlobRepoPG }
+import io.jokester.scala_server_playground.blob.{BlobHandler, BlobRepo, BlobRepoPG}
 import io.jokester.scala_server_playground.hello.HelloHandler
-import io.jokester.scala_server_playground.toy.{ ToyHandler, ToyRoute }
+import io.jokester.scala_server_playground.toy.{ToyHandler, ToyRoute}
 import io.jokester.scala_server_playground.util.RealWorld
 import io.jokester.scala_server_playground.ws.WsEchoHandler
 import scalikejdbc.config.DBs
-import scalikejdbc.{ ConnectionPool, DB }
+import scalikejdbc.{ConnectionPool, DB, GlobalSettings, LoggingSQLAndTimeSettings}
 
 import scala.concurrent.ExecutionContextExecutor
 
 object PlaygroundScalaServer extends HttpApp {
+
+  {
+    // set log for scalikejdbc
+    GlobalSettings.loggingSQLAndTime = LoggingSQLAndTimeSettings(
+      enabled = true,
+      singleLineMode = true,
+      logLevel = 'DEBUG
+    )
+  }
 
   implicit def system: ActorSystem = systemReference.get
 

@@ -2,7 +2,7 @@ package io.jokester.scala_server_playground.chatroom.actor
 
 import java.util.UUID
 
-import akka.actor.{Actor, ActorLogging, Props}
+import akka.actor.{ Actor, ActorLogging, Props }
 import io.jokester.scala_server_playground.util.ActorLifecycleLogging
 
 object ChatroomActor {

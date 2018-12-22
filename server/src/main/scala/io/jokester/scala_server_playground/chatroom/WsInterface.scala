@@ -84,18 +84,30 @@ trait WsInterface {
     ServerJoinedChannel.encodeServerJoinedChannel(
       ServerJoinedChannel(
         chatroomCommand("JoinedChannel", joined.seq),
-        joined.channel
-      )
+        channel = joined.channel,
+        users = joined.users.toIndexedSeq.map(convert),
+        history = joined.history.toIndexedSeq.map(convert)
+      ),
     )
   }
 
-  private implicit def convert(userInfo: Internal.UserInfo): chatroomUserInfo = {
+  private implicit def convert(userInfo: Internal.User): chatroomUserInfo = {
     chatroomUserInfo(userInfo.name, userInfo.uuid.toString)
   }
 
   private implicit def convert(channel: Internal.Channel): chatroomChannelInfo = {
     chatroomChannelInfo(
       name = channel.name,
-      uuid = channel.uuid.toString, users = Some(channel.users.toIndexedSeq.map(convert)))
+      uuid = channel.uuid.toString)
   }
+
+
+  private implicit def convert(chatMessage: Internal.ChatMessage): chatroomChatMessage =
+    chatroomChatMessage(
+      uuid = chatMessage.uuid.toString,
+      userUuid = chatMessage.userUuid.toString,
+      channelUuid = chatMessage.channelUuid.toString,
+      text = chatMessage.text,
+      timestamp = chatMessage.timestamp.toString
+    )
 }

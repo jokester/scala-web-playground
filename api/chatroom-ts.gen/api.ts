@@ -96,12 +96,6 @@ export interface ChatroomChannelInfo {
      * @memberof ChatroomChannelInfo
      */
     uuid: string;
-    /**
-     * 
-     * @type {Array&lt;ChatroomUserInfo&gt;}
-     * @memberof ChatroomChannelInfo
-     */
-    users?: Array<ChatroomUserInfo>;
 }
 
 /**
@@ -115,7 +109,7 @@ export interface ChatroomChatMessage {
      * @type {string}
      * @memberof ChatroomChatMessage
      */
-    uuid?: string;
+    uuid: string;
     /**
      * 
      * @type {string}
@@ -266,6 +260,12 @@ export interface ServerJoinedChannel {
      * @memberof ServerJoinedChannel
      */
     channel: ChatroomChannelInfo;
+    /**
+     * 
+     * @type {Array&lt;ChatroomUserInfo&gt;}
+     * @memberof ServerJoinedChannel
+     */
+    users: Array<ChatroomUserInfo>;
     /**
      * 
      * @type {Array&lt;ChatroomChatMessage&gt;}

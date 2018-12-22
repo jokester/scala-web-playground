@@ -233,6 +233,12 @@
         "channel": {
           "$ref": "#/definitions/chatroomChannelInfo"
         },
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chatroomUserInfo"
+          }
+        },
         "history": {
           "type": "array",
           "items": {
@@ -243,6 +249,7 @@
       "required": [
         "cmd",
         "channel",
+        "users",
         "history"
       ]
     },
@@ -385,12 +392,6 @@
         },
         "uuid": {
           "type": "string"
-        },
-        "users": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chatroomUserInfo"
-          }
         }
       },
       "required": [
@@ -419,10 +420,11 @@
         }
       },
       "required": [
-        "timestamp",
+        "uuid",
         "userUuid",
         "channelUuid",
-        "text"
+        "text",
+        "timestamp"
       ]
     },
     "chatroomCommand": {

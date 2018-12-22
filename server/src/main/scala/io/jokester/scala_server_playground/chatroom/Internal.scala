@@ -8,10 +8,10 @@ object Internal {
 
   case class UserConnected(actor: ActorRef)
 
-  final case class UserInfo(name: String, uuid: UUID)
+  case class User(name: String, uuid: UUID)
 
-  final case class Channel(name: String, uuid: UUID, users: Seq[UserInfo])
+  case class Channel(name: String, uuid: UUID)
 
-  final case class ChatMessage(uuid: UUID, userUuid: UUID, channelUuid: UUID, text: String, timestamp: Date)
+  case class ChatMessage(uuid: UUID, userUuid: UUID, channelUuid: UUID, text: String, timestamp: Date)
 
 }

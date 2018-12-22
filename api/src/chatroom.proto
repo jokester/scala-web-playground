@@ -26,11 +26,10 @@ message ChannelInfo {
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["name", "uuid"] } };
   string name = 1;
   string uuid = 2;
-  repeated UserInfo users = 3;
 }
 
 message ChatMessage {
-  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["timestamp", "userUuid", "channelUuid", "text"] } };
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["uuid", "userUuid", "channelUuid", "text", "timestamp"] } };
   string uuid        = 9; // primary key
   string userUuid    = 10;
   string channelUuid = 12;
@@ -96,10 +95,11 @@ message Server {
     UserInfo identity = 2;
   }
   message JoinedChannel {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "channel", "history"] } };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "channel", "users", "history"] } };
     Command     cmd     = 1;
     ChannelInfo channel = 2;
-    repeated ChatMessage history = 3;
+    repeated UserInfo users = 3;
+    repeated ChatMessage history = 4;
   }
   message LeftChannel {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "reason"] } };

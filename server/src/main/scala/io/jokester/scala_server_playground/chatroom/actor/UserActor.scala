@@ -3,7 +3,7 @@ package io.jokester.scala_server_playground.chatroom.actor
 import java.util.UUID
 
 import akka.actor._
-import io.jokester.scala_server_playground.chatroom.{Internal, ServerMessage, UserMessage}
+import io.jokester.scala_server_playground.chatroom.{ Internal, ServerMessage, UserMessage }
 import io.jokester.scala_server_playground.util.ActorLifecycleLogging
 
 object UserActor {
@@ -20,7 +20,7 @@ class UserActor(uuid: UUID) extends Actor with ActorLogging with ActorLifecycleL
 
   var joinedRooms = Map.empty[String, ActorRef]
   var outgoing: Option[ActorRef] = None
-  var userInfo: Option[UserInfo] = None
+  var userInfo: Option[User] = None
 
   override def receive: Receive = wrapContext {
     case UserConnected(o) if outgoing.isEmpty =>
@@ -32,7 +32,7 @@ class UserActor(uuid: UUID) extends Actor with ActorLogging with ActorLifecycleL
   private def connected: Receive = wrapContext {
     // silly way to keep as a PartialFunction
     case Auth(seq, name, otp) if otp == "otp" =>
-      val userInfo = UserInfo(name, uuid)
+      val userInfo = User(name, uuid)
       this.userInfo = Some(userInfo)
       outgoing.get ! Authed(seq, userInfo)
       context become authed

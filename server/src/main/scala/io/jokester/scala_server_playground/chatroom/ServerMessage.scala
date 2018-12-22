@@ -10,7 +10,9 @@ object ServerMessage {
 
   case class Fail(seq: Int, errors: Seq[String]) extends ToUser(seq)
 
-  case class Authed(seq: Int, identity: UserInfo) extends ToUser(seq)
+  case class Authed(seq: Int, identity: User) extends ToUser(seq)
 
-  case class JoinedChannel(seq: Int, channel: Channel) extends ToUser(seq)
+  case class JoinedChannel(seq: Int, channel: Channel, users: Seq[User], history: Seq[ChatMessage])
+    extends ToUser(seq)
+
 }

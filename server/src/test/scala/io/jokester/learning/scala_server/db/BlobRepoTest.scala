@@ -3,11 +3,12 @@ package io.jokester.learning.scala_server.db
 import java.nio.ByteBuffer
 import java.util.Random
 
-import io.jokester.learning.scala_server.repo.{ Blob, BlobRepoImpl }
-import io.jokester.learning.scala_server.util.{ ControlledEntropy, Entropy }
-import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
+import io.jokester.scala_server_playground.hello.repo.{Blob, BlobRepoImpl}
+import io.jokester.learning.scala_server.util.ControlledEntropy
+import io.jokester.scala_server_playground.util.{ControlledEntropy, Entropy}
+import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
 import scalikejdbc.config.DBs
-import scalikejdbc.{ ConnectionPool, DB }
+import scalikejdbc.{ConnectionPool, DB}
 
 class BlobRepoTest extends WordSpec with Matchers with BeforeAndAfterAll {
 

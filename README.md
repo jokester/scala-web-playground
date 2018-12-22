@@ -1,37 +1,19 @@
-# scala-server
+# akka-server-playground
 
-a playground for scala server
+a playground for scala/akka server
 
+## chat-room
+
+- ChatRoom
 - akka-based server (http / websocket)
 - react.js web UI
 - swagger codegen (guardrail)
 
-## API
+## hanhuazu
 
-## Server
+WIP
 
-## Web
+## LICENSE
 
-### Architecture
+WTFPL
 
-- UI: MVVM
-- Repo
-    - event-emitter
-- Real-World
-- Util
-
---------
-
-```sh
-
-# run dev
-
-createdb hanhuazu_dev
-sbt flywayMigrate run
-
-# test
-
-createdb hanhuazu_test
-sbt test:flywayMigrate test
-
-```

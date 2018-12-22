@@ -1,9 +1,10 @@
 package io.jokester.learning.scala_server.toy
 
-import io.jokester.learning.scala_server.repo.{ ToyAction, ToyDatabaseRepo }
-import org.scalatest.{ AsyncWordSpec, Matchers }
+import io.jokester.scala_server_playground.hello.repo.ToyAction
+import io.jokester.scala_server_playground.toy.ToyDatabaseRepo
+import org.scalatest.{AsyncWordSpec, Matchers}
 import scalikejdbc.config.DBs
-import scalikejdbc.{ ConnectionPool, DB }
+import scalikejdbc.{ConnectionPool, DB}
 
 class ToyDatabaseRepoTest extends AsyncWordSpec with Matchers {
 
@@ -15,9 +16,9 @@ class ToyDatabaseRepoTest extends AsyncWordSpec with Matchers {
     val repo = new ToyDatabaseRepo(() => DB(cpool.borrow))
 
     "return last" in {
-      val futureS1 = repo.getS
-      val futureS2 = repo.reduceS(ToyAction(5))
-      val futureS3 = repo.getS
+      val futureS1 = repo.getState
+      val futureS2 = repo.mutateState(ToyAction(5))
+      val futureS3 = repo.getState
 
       for (s1 <- futureS1; s2 <- futureS2; s3 <- futureS3) yield {
         s2.value shouldBe (s1.value + 5)

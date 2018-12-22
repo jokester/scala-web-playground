@@ -11,11 +11,13 @@ object ToyStateDB {
     override val tableName = "toystate"
 
     def apply(g: ResultName[ToyState])(rs: WrappedResultSet) =
-      new ToyState(rs.int(g.value), rs.int(g.revision))
+      new ToyState(value = rs.int(g.value), revision = rs.int(g.revision))
+
+    // NOT scalike-jdbc way: but works
+    def apply(rs: WrappedResultSet) =
+      new ToyState(value = rs.int("value"), revision = rs.int("revision"))
   }
 
-  val t: scalikejdbc.QuerySQLSyntaxProvider[scalikejdbc.SQLSyntaxSupport[ToyState], ToyState] = ToyState.syntax("t")
-  val c: scalikejdbc.ColumnName[ToyState] = ToyState.column
 }
 
 class ToyDBRepoBasic(db: () => DB) extends ToyRepo with LazyLogging {
@@ -23,16 +25,19 @@ class ToyDBRepoBasic(db: () => DB) extends ToyRepo with LazyLogging {
   import ToyStateDB._
 
   private def syncGetState(): ToyState = db() readOnly { implicit session =>
+
+    val t = ToyState.syntax("t")
     sql"""
-     SELECT * FROM toystate ORDER BY revision DESC LIMIT 1 ;
+     SELECT ${t.result.*} FROM ${ToyState as t} ORDER BY revision DESC LIMIT 1 ;
       """.map(ToyState(t.resultName)).first().apply().get
   }
 
-  private def syncInsert(s: ToyState): ToyState = db() localTx { implicit session =>
+  private def syncInsert(s: ToyState): Unit = db() localTx { implicit session =>
+    val t = ToyState.syntax("t")
     sql"""
-    INSERT INTO ${ToyState as t} VALUE (${s.revision}, ${s.value})
-    RETURNING *;
-    """.map(ToyState(t.resultName)).first().apply().get
+    INSERT INTO toystate VALUES (${s.revision}, ${s.value});
+    """.update().apply()
+    s
   }
 
   override def getState: Future[ToyState] = Future.successful(syncGetState())
@@ -40,8 +45,8 @@ class ToyDBRepoBasic(db: () => DB) extends ToyRepo with LazyLogging {
   override def mutateState(a: ToyAction): Future[ToyState] = db() localTx { implicit session =>
     val s = syncGetState()
     val newState = s.reduce(a)
-    val inserted = syncInsert(newState)
-    Future.successful(inserted)
+    syncInsert(newState)
+    Future.successful(newState)
   }
 }
 
@@ -56,11 +61,13 @@ class ToyDBRepoNolock(db: () => DB) extends ToyDBRepoBasic(db) with LazyLogging 
    * @return
    */
   private def syncMutate(a: ToyAction): ToyState = db() localTx { implicit session =>
+    val t = ToyState.syntax("t")
+
     sql"""
-    INSERT INTO ${ToyState as t}
-        (SELECT (1 + revision) revision, (${a.delta} + value) value FROM toystate ORDER BY revision DESC LIMIT 1)
+    INSERT INTO toystate
+        (SELECT (1 + revision) AS revision, (${a.delta} + value) AS value FROM toystate ORDER BY revision DESC LIMIT 1)
     RETURNING *;
-    """.map(ToyState(t.resultName)).first().apply().get
+    """.map(ToyState(_)).first().apply().get
   }
 
   override def mutateState(a: ToyAction): Future[ToyState] = db() localTx { implicit session =>

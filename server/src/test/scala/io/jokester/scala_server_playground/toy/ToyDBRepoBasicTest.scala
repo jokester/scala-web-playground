@@ -11,9 +11,14 @@ class ToyDBRepoBasicTest extends AsyncWordSpec with Matchers {
   "ToyDatabaseRepo" should {
     val cpool = ConnectionPool('default)
 
-    val repo = new ToyDBRepoBasic(() => DB(cpool.borrow))
+    testRepo(new ToyRepoMemoryUnsafe)
+    testRepo(new ToyRepoMemorySynced)
+    testRepo(new ToyDBRepoBasic(() => DB(cpool.borrow)))
+    testRepo(new ToyDBRepoNolock(() => DB(cpool.borrow)))
+  }
 
-    "return last" in {
+  def testRepo(repo: ToyRepo): Unit = {
+    s"return updated state for ${repo.getClass}" in {
       val futureS1 = repo.getState
       val futureS2 = repo.mutateState(ToyAction(5))
       val futureS3 = repo.getState
@@ -23,6 +28,5 @@ class ToyDBRepoBasicTest extends AsyncWordSpec with Matchers {
         s3 shouldEqual s2
       }
     }
-
   }
 }

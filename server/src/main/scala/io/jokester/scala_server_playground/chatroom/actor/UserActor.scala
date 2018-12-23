@@ -101,6 +101,9 @@ class UserActor(uuid: UUID, daemon: ActorRef, e: Entropy) extends Actor with Act
           leftUsers = (channelMembers(channel.uuid) -- users).toSeq,
           newMessages = if (sendMessages) newMessages else Nil)),
       newUsers = newUsers.toSeq)
+
+    channelMembers += channel.uuid -> users
+    clientKnownUsers ++= newUsers
   }
 
   private def hookBeforeReceive: Receive = {

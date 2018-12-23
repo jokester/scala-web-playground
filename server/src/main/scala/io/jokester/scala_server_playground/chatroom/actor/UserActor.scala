@@ -15,14 +15,12 @@ object UserActor {
 class UserActor(uuid: UUID, daemon: ActorRef) extends Actor with ActorLogging with ActorLifecycleLogging {
 
   import Internal._
-  import ServerMessage._
-  import UserMessage._
 
   private var nextServerSeq = -1
   private var outgoing: Option[ActorRef] = None
-  private var userInfo: Option[User] = None
-  private var joiningRoom: Map[String, Int] = Map.empty
-  private var joinedRoom: Map[UUID, ActorRef] = Map.empty
+  private var userIdentity: Option[User] = None
+  private var channelsWaitingJoin: Map[String, Int] = Map.empty
+  private var channelsJoined: Map[UUID, ActorRef] = Map.empty
 
   override def receive: Receive = wrapContext {
     case UserConnected(o) if outgoing.isEmpty =>
@@ -33,29 +31,34 @@ class UserActor(uuid: UUID, daemon: ActorRef) extends Actor with ActorLogging wi
 
   private def connected: Receive = wrapContext {
     // silly way to keep as a PartialFunction
-    case Auth(seq, name, otp) if otp == "otp" =>
+    case UserMessage.Auth(seq, name, otp) if otp == "otp" =>
       val userInfo = User(name, uuid)
-      this.userInfo = Some(userInfo)
-      outgoing.get ! Authed(seq, userInfo)
+      this.userIdentity = Some(userInfo)
+      outgoing.get ! ServerMessage.Authed(seq, userInfo)
       daemon ! UserAuthed(userInfo)
       context become authed
   }
 
   private def authed: Receive = wrapContext {
     case UserMessage.JoinChannel(seq: Int, name: String) =>
-      joiningRoom += name -> seq
-      daemon ! JoinRequest(from = userInfo.get, name, self)
-    case b @ ChannelBroadcast(channel, users, messages) if joiningRoom.contains(channel.name) =>
-      outgoing.get ! JoinedChannel(joiningRoom(channel.name), channel, users, messages)
-      joinedRoom += channel.uuid -> sender
-      joiningRoom -= channel.name
-    case b @ ChannelBroadcast(channel, users, messages) if joinedRoom.contains(channel.uuid) =>
+      channelsWaitingJoin += name -> seq
+      daemon ! JoinRequest(from = userIdentity.get, name, self)
+    case ChannelBroadcast(channel, users, messages) if channelsWaitingJoin.contains(channel.name) =>
+      outgoing.get ! ServerMessage.JoinedChannel(channelsWaitingJoin(channel.name), channel, users, messages)
+      channelsJoined += channel.uuid -> sender
+      channelsWaitingJoin -= channel.name
+    case ChannelBroadcast(channel, users, messages) if channelsJoined.contains(channel.uuid) =>
       nextServerSeq -= 1
       outgoing.get ! ServerMessage.BroadCast(
         nextServerSeq,
         users,
         Seq(channel),
         messages)
+    case UserMessage.LeaveChannel(seq, channelUuid) if channelsJoined.contains(channelUuid) =>
+      daemon ! LeaveRequest(userIdentity.get, channelUuid)
+      outgoing.get ! ServerMessage.LeftChannel(seq, "voluntarily")
+      channelsJoined -= channelUuid
+
   }
 
   private def hookBeforeReceive: Receive = {
@@ -63,14 +66,14 @@ class UserActor(uuid: UUID, daemon: ActorRef) extends Actor with ActorLogging wi
       log.debug("user disconnected, stopping")
       daemon ! m
       context.stop(self)
-    case Ping(seqNo) =>
-      outgoing.get ! Pong(seqNo)
+    case UserMessage.Ping(seqNo) =>
+      outgoing.get ! ServerMessage.Pong(seqNo)
   }
 
   private def hookAfterReceive: Receive = {
-    case m: FromUser =>
+    case m: UserMessage.FromUser =>
       log.warning("unhandled message: {}", m.seq)
-      outgoing.get ! Fail(m.seq, Seq("unhandled message"))
+      outgoing.get ! ServerMessage.Fail(m.seq, Seq("unhandled message"))
   }
 
   private def wrapContext(inner: Receive): Receive = {

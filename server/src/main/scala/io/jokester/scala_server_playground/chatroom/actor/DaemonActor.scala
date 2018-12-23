@@ -1,5 +1,7 @@
 package io.jokester.scala_server_playground.chatroom.actor
 
+import java.util.UUID
+
 import akka.actor._
 import io.jokester.scala_server_playground.util.{ ActorLifecycleLogging, Entropy }
 
@@ -7,23 +9,40 @@ object DaemonActor {
   def props(e: Entropy) = Props(new DaemonActor(e))
 }
 
-// singleton daemon: create chatrooms and guide user to requested chatroom
+/**
+ *
+ * singleton daemon:
+ * - create channels
+ * - forward join/leave request to the channel
+ * - shutdown channel after all user leaves
+ *
+ * @param e
+ */
 class DaemonActor(e: Entropy) extends Actor with ActorLogging with ActorLifecycleLogging {
 
   import io.jokester.scala_server_playground.chatroom.Internal._
 
-  var authedUsers: Map[User, List[String]] = Map.empty
-  var channelName2Actor: Map[String, ActorRef] = Map.empty
+  type ExistingChannel = (Channel, ActorRef)
+
+  var authedUsers: Map[User, Set[String]] = Map.empty
+  var channels: Map[UUID, ExistingChannel] = Map.empty
+  var channelName2uuid: Map[String, UUID] = Map.empty
 
   override def receive: Receive = {
 
     case UserAuthed(user) if !authedUsers.contains(user) =>
-      authedUsers += user -> Nil
+      authedUsers += user -> Set.empty
 
-    case join @ JoinRequest(user, channel, _) if authedUsers.contains(user) =>
-      val c = channelOfName(channel)
-      authedUsers += user -> (channel :: authedUsers(user))
-      c ! join
+    case join @ JoinRequest(user, channelName, _) if authedUsers.contains(user) =>
+      val (_, a) = channelOfName(channelName)
+      a ! join
+      authedUsers += user -> (authedUsers(user) + channelName)
+
+    case leave @ LeaveRequest(user, channelUuid) if authedUsers.contains(user) && channels.contains(channelUuid) =>
+      val (channel, a) = channels(channelUuid)
+      authedUsers += user -> (authedUsers(user) - channel.name)
+      a ! leave
+      shutdownEmptyChannel()
 
     case d @ UserDisconnected(userUuid) =>
       for (
@@ -33,25 +52,53 @@ class DaemonActor(e: Entropy) extends Actor with ActorLogging with ActorLifecycl
         authedUsers -= user
         for (
           channelName <- channelNames;
-          channelActor <- channelName2Actor.get(channelName)
+          channelUuid <- channelName2uuid.get(channelName);
+          (_, a) <- channels.get(channelUuid)
         ) {
-          channelActor ! d
+          a ! d
         }
       }
+      shutdownEmptyChannel()
+
+    case AdminQueryUserCount() =>
+      sender ! AdminQueryUserCountRes(
+        authedUsers.keys.toSeq,
+        channels.values.map(_._1).toSeq,
+        countChannelUsers())
 
     //    case m =>
     //      log.warning("unhandled message: {}", m)
   }
 
-  private def channelOfName(name: String): ActorRef = {
-    if (channelName2Actor.contains(name)) {
-      channelName2Actor(name)
+  private def countChannelUsers(): Map[String, Int] =
+    authedUsers.values.flatten.foldLeft[Map[String, Int]](Map.empty) { (count, channelName) =>
+      count.updated(
+        channelName,
+        1 + count.getOrElse(channelName, 0))
+    }
+
+  private def shutdownEmptyChannel(): Unit = {
+    val userCount = countChannelUsers()
+    for (emptyChannelName <- channelName2uuid.keys.filterNot(userCount contains)) {
+      val channelUuid = channelName2uuid(emptyChannelName)
+      context.stop(channels(channelUuid)._2)
+      channels -= channelUuid
+      channelName2uuid -= emptyChannelName
+    }
+  }
+
+  private def channelOfName(name: String): ExistingChannel = {
+    if (channelName2uuid.contains(name)) {
+      channels(channelName2uuid(name))
     } else {
-      val newChannel = context.actorOf(
-        ChannelActor.props(e.nextUUID(), name),
-        name = s"chatroom-$name")
-      channelName2Actor += name -> newChannel
-      newChannel
+      val channel = Channel(name, uuid = e.nextUUID())
+      val channelActor = context.actorOf(
+        ChannelActor.props(channel),
+        name = s"ChannelActor-$name")
+      val c = (channel, channelActor)
+      channels += channel.uuid -> c
+      channelName2uuid += name -> channel.uuid
+      c
     }
   }
 

@@ -1,6 +1,6 @@
 package io.jokester.scala_server_playground.util
 
-import java.util.{Random, UUID}
+import java.util.{ Random, UUID }
 
 trait Entropy {
   def nextUUID(): UUID

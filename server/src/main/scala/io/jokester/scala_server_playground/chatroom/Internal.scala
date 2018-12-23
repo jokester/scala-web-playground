@@ -20,6 +20,11 @@ object Internal {
 
   case class JoinRequest(from: User, channel: String, userActor: ActorRef)
 
+  case class LeaveRequest(from: User, channelUuid: UUID)
+
   case class ChannelBroadcast(from: Channel, users: Seq[User], messages: Seq[ChatMessage])
 
+  case class AdminQueryUserCount()
+
+  case class AdminQueryUserCountRes(users: Seq[User], channels: Seq[Channel], channelUserCount: Map[String, Int])
 }

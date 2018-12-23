@@ -32,5 +32,5 @@ export async function tryConnection() {
   await wait(3e3);
   await pipe.sink.sendChat(chan1.channel.uuid, "mesg3");
   await wait(3e3);
-  await pipe.sink.leaveChannel(chan1.channel.uuid);
+  // await pipe.sink.leaveChannel(chan1.channel.uuid);
 }

@@ -29,7 +29,7 @@ object Internal {
 
   case class SendMessageResponse(messageUuid: UUID)
 
-  case class ChannelBroadcast(from: Channel, users: Seq[User], messages: Seq[ChatMessage])
+  case class ChannelBroadcast(from: Channel, users: Set[User], newMessages: Seq[ChatMessage])
 
   // ----------- admin
   case class AdminQueryUserCount()

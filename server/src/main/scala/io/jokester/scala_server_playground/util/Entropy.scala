@@ -12,7 +12,7 @@ trait Entropy {
   }
 }
 
-class ControlledEntropy(var r: Random, var currentServerTime: ZonedDateTime) extends Entropy {
+class ControlledEntropy(var r: Random, var currentServerTime: ZonedDateTime = RealWorld.currentServerTime()) extends Entropy {
   override def nextUUID(): UUID = new UUID(r.nextLong(), r.nextLong())
 }
 

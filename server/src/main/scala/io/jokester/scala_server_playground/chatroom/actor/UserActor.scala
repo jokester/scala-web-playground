@@ -23,6 +23,8 @@ class UserActor(uuid: UUID, daemon: ActorRef, e: Entropy) extends Actor with Act
   private var channelsJoining: Map[String, Int] = Map.empty
   private var channelsJoined: Map[UUID, ActorRef] = Map.empty
   private var messagesSending: Map[UUID, (Int, ChatMessage)] = Map.empty
+  private var clientKnownUsers: Set[User] = Set.empty
+  private var channelMembers: Map[UUID, Set[User]] = Map.empty
 
   override def receive: Receive = wrapContext {
     case UserConnected(o) if outgoing.isEmpty =>
@@ -67,13 +69,17 @@ class UserActor(uuid: UUID, daemon: ActorRef, e: Entropy) extends Actor with Act
       outgoing.get ! ServerMessage.SentMessage(seq, msg)
 
     case b @ ChannelBroadcast(channel, users, messages) if channelsJoining.contains(channel.name) =>
-      outgoing.get ! ServerMessage.JoinedChannel(channelsJoining(channel.name), channel, users, messages)
-      channelsJoined += channel.uuid -> sender
+      // just joined a channel
+      outgoing.get ! ServerMessage.JoinedChannel(
+        channelsJoining(channel.name), channel, users.toSeq, messages)
       channelsJoining -= channel.name
-      forwardChannelBroadcast(b)
+      channelsJoined += channel.uuid -> sender
+      clientKnownUsers ++= users
+      channelMembers += channel.uuid -> users
+      handleChannelBroadcast(b, sendMessages = false)
 
     case b @ ChannelBroadcast(channel, _, _) if channelsJoined.contains(channel.uuid) =>
-      forwardChannelBroadcast(b)
+      handleChannelBroadcast(b)
 
   }
 
@@ -82,12 +88,19 @@ class UserActor(uuid: UUID, daemon: ActorRef, e: Entropy) extends Actor with Act
     _nextServerMessageSeq
   }
 
-  private def forwardChannelBroadcast(b: ChannelBroadcast): Unit = {
+  private def handleChannelBroadcast(b: ChannelBroadcast, sendMessages: Boolean = true): Unit = {
+    val ChannelBroadcast(channel, users, newMessages) = b
+    val newUsers = users -- clientKnownUsers
+
     outgoing.get ! ServerMessage.BroadCast(
       nextServerMessageSeq(),
-      b.users,
-      Seq(b.from),
-      b.messages)
+      channels = List(
+        ServerMessage.ChannelBroadcast(
+          channel = channel,
+          joinedUsers = (users -- channelMembers(channel.uuid)).toSeq,
+          leftUsers = (channelMembers(channel.uuid) -- users).toSeq,
+          newMessages = if (sendMessages) newMessages else Nil)),
+      newUsers = newUsers.toSeq)
   }
 
   private def hookBeforeReceive: Receive = {

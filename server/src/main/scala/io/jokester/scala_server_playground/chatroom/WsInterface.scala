@@ -115,8 +115,8 @@ trait WsInterface {
     ServerBroadcast.encodeServerBroadcast(
       ServerBroadcast(
         chatroomCommand("Broadcast", b.seq),
-        b.channels.map(convert).toIndexedSeq,
-        b.messages.map(convert).toIndexedSeq))
+        channels = b.channels.map(convert).toIndexedSeq,
+        newUsers = b.newUsers.map(convert).toIndexedSeq))
   }
 
   private implicit def convert(b: ServerMessage.SentMessage): Json = {
@@ -143,4 +143,14 @@ trait WsInterface {
       channelUuid = chatMessage.channelUuid.toString,
       text = chatMessage.text,
       timestamp = chatMessage.timestamp.toString)
+
+  private implicit def convert(channelBroadcast: ServerMessage.ChannelBroadcast): ServerChannelBroadcast = {
+    val ServerMessage.ChannelBroadcast(channel, joinedUsers, leftUsers, newMessages) = channelBroadcast
+    ServerChannelBroadcast(
+      channelUuid = channel.uuid.toString,
+      joinedUsers = joinedUsers.map(_.uuid.toString).toIndexedSeq,
+      leftUsers = leftUsers.map(_.uuid.toString).toIndexedSeq,
+      newMessages = newMessages.map(convert).toIndexedSeq
+    )
+  }
 }

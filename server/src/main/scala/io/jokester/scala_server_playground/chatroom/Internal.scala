@@ -24,7 +24,7 @@ object Internal {
 
   case class ChannelBroadcast(from: Channel, users: Seq[User], messages: Seq[ChatMessage])
 
-  case class AdminQuery()
+  case class AdminQueryUserCount()
 
-  case class AdminQueryRes(users: Seq[User], user2Channels: Map[UUID, Channel])
+  case class AdminQueryUserCountRes(users: Seq[User], channels: Seq[Channel], channelUserCount: Map[String, Int])
 }

@@ -1,4 +1,4 @@
-import { getLogger } from "../util";
+import { getLogger, isDevBuild } from "../util";
 import { TypedEventEmitter } from "../util/typed-event-emitter";
 
 const logger = getLogger(__filename);
@@ -60,7 +60,9 @@ export class WsConnection extends TypedEventEmitter<WsEventMap> {
     };
 
     newSocket.onmessage = (ev) => {
-      logger.debug("received ws message", ev.data);
+      if (!shouldHideIncomingEvent(ev.data)) {
+        logger.debug("received ws message", ev.data);
+      }
       this.emit("message", ev.data);
     };
   }
@@ -82,7 +84,9 @@ export class WsConnection extends TypedEventEmitter<WsEventMap> {
 
   sendMessage(msgObj: {}) {
     if (this.state === WsState.connected) {
-      logger.debug("sending ws message", msgObj);
+      if (!shouldHideOutgoingEvent(msgObj)) {
+        logger.debug("sending ws message", msgObj);
+      }
       const msg = JSON.stringify(msgObj);
       this.socket!.send(msg);
     } else {
@@ -96,4 +100,21 @@ export class WsConnection extends TypedEventEmitter<WsEventMap> {
       this.emit("statusChange", newState);
     }
   }
+}
+
+function shouldHideOutgoingEvent(msg: { cmd?: { method?: string }}) {
+  return msg && msg.cmd && msg.cmd.method === 'Ping';
+}
+
+function shouldHideIncomingEvent(data: string) {
+  if (!isDevBuild) return true;
+  try {
+    const parsed = JSON.parse(data);
+    if (parsed && parsed.cmd && parsed.cmd.method === "Pong") {
+      return true;
+    }
+  } catch (e) {
+  }
+
+  return false;
 }

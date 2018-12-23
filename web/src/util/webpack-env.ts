@@ -16,3 +16,4 @@ export function getWebpackEnv<ExtraEnv extends {} = {}>() {
 }
 
 export const isProdBuild = getWebpackEnv().NODE_ENV === 'production';
+export const isDevBuild = !isProdBuild;

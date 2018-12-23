@@ -1,5 +1,7 @@
 package io.jokester.scala_server_playground.chatroom
 
+import java.util.UUID
+
 object ServerMessage {
 
   import Internal._
@@ -17,6 +19,10 @@ object ServerMessage {
 
   case class LeftChannel(seq: Int, reason: String) extends ToUser(seq)
 
-  case class BroadCast(seq: Int, users: Seq[User], channels: Seq[Channel], messages: Seq[ChatMessage]) extends ToUser(seq)
+  case class SentMessage(seq: Int, msg: ChatMessage) extends ToUser(seq)
+
+  case class ChannelBroadcast(channel: Channel, joinedUsers: Seq[User], leftUsers: Seq[User], newMessages: Seq[ChatMessage])
+
+  case class BroadCast(seq: Int, channels: Seq[ChannelBroadcast], newUsers: Seq[User]) extends ToUser(seq)
 
 }

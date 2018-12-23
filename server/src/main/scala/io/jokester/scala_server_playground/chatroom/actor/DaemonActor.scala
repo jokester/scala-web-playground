@@ -2,6 +2,7 @@ package io.jokester.scala_server_playground.chatroom.actor
 
 import java.util.UUID
 
+import scala.concurrent.duration._
 import akka.actor._
 import io.jokester.scala_server_playground.util.{ ActorLifecycleLogging, Entropy }
 
@@ -81,9 +82,12 @@ class DaemonActor(e: Entropy) extends Actor with ActorLogging with ActorLifecycl
     val userCount = countChannelUsers()
     for (emptyChannelName <- channelName2uuid.keys.filterNot(userCount contains)) {
       val channelUuid = channelName2uuid(emptyChannelName)
-      context.stop(channels(channelUuid)._2)
+      val (_, channelActor) = channels(channelUuid)
       channels -= channelUuid
       channelName2uuid -= emptyChannelName
+
+      // not sending poisonpill: channel actor should stop itself
+      // context.system.scheduler.scheduleOnce(5 seconds, channelActor, PoisonPill)(context.dispatcher)
     }
   }
 
@@ -94,7 +98,7 @@ class DaemonActor(e: Entropy) extends Actor with ActorLogging with ActorLifecycl
       val channel = Channel(name, uuid = e.nextUUID())
       val channelActor = context.actorOf(
         ChannelActor.props(channel),
-        name = s"ChannelActor-$name")
+        name = s"ChannelActor-$name-${channel.uuid}")
       val c = (channel, channelActor)
       channels += channel.uuid -> c
       channelName2uuid += name -> channel.uuid

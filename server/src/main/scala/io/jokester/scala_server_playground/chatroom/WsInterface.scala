@@ -50,6 +50,9 @@ trait WsInterface {
         case n if n == "LeaveChannel" =>
           UserLeaveChannel.decodeUserLeaveChannel.decodeJson(json)
           .map(m => UserMessage.LeaveChannel(m.cmd.seq, channelUuid = UUID.fromString(m.channelUuid)))
+        case n if n == "SendChat" =>
+          UserSendChat.decodeUserSendChat.decodeJson(json)
+          .map(m => UserMessage.SendChatMessage(m.cmd.seq, channelUuid = UUID.fromString(m.channelUuid), m.text))
       }
     }
   }
@@ -62,6 +65,8 @@ trait WsInterface {
       case msg: ServerMessage.Authed => msg
       case msg: ServerMessage.JoinedChannel => msg
       case msg: ServerMessage.LeftChannel => msg
+      case msg: ServerMessage.SentMessage => msg
+      case msg: ServerMessage.BroadCast => msg
     }
 
     TextMessage(json.toString())
@@ -106,6 +111,21 @@ trait WsInterface {
     )
   }
 
+  private implicit def convert(b: ServerMessage.BroadCast): Json = {
+    ServerBroadcast.encodeServerBroadcast(
+      ServerBroadcast(
+        chatroomCommand("Broadcast", b.seq),
+        channels = b.channels.map(convert).toIndexedSeq,
+        newUsers = b.newUsers.map(convert).toIndexedSeq))
+  }
+
+  private implicit def convert(b: ServerMessage.SentMessage): Json = {
+    ServerSentChat.encodeServerSentChat(
+      ServerSentChat(
+        chatroomCommand("SentChat", b.seq),
+        b.msg))
+  }
+
   private implicit def convert(userInfo: Internal.User): chatroomUserInfo = {
     chatroomUserInfo(userInfo.name, userInfo.uuid.toString)
   }
@@ -116,13 +136,21 @@ trait WsInterface {
       uuid = channel.uuid.toString)
   }
 
-
   private implicit def convert(chatMessage: Internal.ChatMessage): chatroomChatMessage =
     chatroomChatMessage(
       uuid = chatMessage.uuid.toString,
       userUuid = chatMessage.userUuid.toString,
       channelUuid = chatMessage.channelUuid.toString,
       text = chatMessage.text,
-      timestamp = chatMessage.timestamp.toString
+      timestamp = chatMessage.timestamp.toString)
+
+  private implicit def convert(channelBroadcast: ServerMessage.ChannelBroadcast): ServerChannelBroadcast = {
+    val ServerMessage.ChannelBroadcast(channel, joinedUsers, leftUsers, newMessages) = channelBroadcast
+    ServerChannelBroadcast(
+      channelUuid = channel.uuid.toString,
+      joinedUsers = joinedUsers.map(_.uuid.toString).toIndexedSeq,
+      leftUsers = leftUsers.map(_.uuid.toString).toIndexedSeq,
+      newMessages = newMessages.map(convert).toIndexedSeq
     )
+  }
 }

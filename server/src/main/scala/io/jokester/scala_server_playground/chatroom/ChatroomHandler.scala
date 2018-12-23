@@ -47,7 +47,7 @@ class ChatroomHandler(implicit system: ActorSystem, implicit val entropy: Entrop
       .wireTap { decoded =>
         decoded.fold(
           err => logger.warn("error decoding message", err),
-          msg => logger.debug("got message: {}", msg))
+          msg => if (!msg.isInstanceOf[UserMessage.Ping]) logger.debug("got message: {}", msg))
       }
       //      .filter(_.isRight)
       //      .map(_.right.get)
@@ -64,7 +64,7 @@ class ChatroomHandler(implicit system: ActorSystem, implicit val entropy: Entrop
         .mapMaterializedValue { outActor =>
           userActor ! UserConnected(outActor)
         }
-        .wireTap(msg => logger.debug("sending message: {}", msg))
+        .wireTap(msg => if (!msg.isInstanceOf[ServerMessage.Pong]) logger.debug("sending message: {}", msg))
         .map(encode)
 
     Flow.fromSinkAndSource(incoming, outgoing)

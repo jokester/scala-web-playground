@@ -16,9 +16,17 @@ export function createRepo() {
   const pipe = createEventPipe(buildEnv.REACT_APP_WS_URL);
   const repo = new AppRepo(pipe);
 
-  repo.startConnect("nick");
 
   return repo;
+}
+
+export async function tryRepo() {
+  const repo = createRepo();
+  await repo.startConnect("nick");
+
+  const channelRepo = repo.getChannelRepo("chan1");
+
+
 }
 
 export async function tryConnection() {

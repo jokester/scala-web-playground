@@ -113,17 +113,16 @@ export class ChannelRepo implements ChannelStore {
   }
 
   @action
-  leave() {
+  async leave() {
     this.assertState(ChannelState.joined);
-    const leave = this.eventSink.leaveChannel(this.uuid!);
     try {
-      this.conn.sendMessage(leave);
+      const { reason } = await this.eventSink.leaveChannel(this.uuid!);
+      logger.debug(`left channel=${this.channelName}: ${reason}`);
+    } finally {
       runInAction(() => {
-        this.state = ChannelState.left;
         this.uuid = undefined;
+        this.state = ChannelState.left;
       });
-    } catch (e) {
-      runInAction(() => this.state = ChannelState.left);
     }
   }
 

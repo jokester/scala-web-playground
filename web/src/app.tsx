@@ -36,6 +36,9 @@ export async function tryRepo() {
 
   await channelRepo.sendMessage("chan1-msg2");
 
+  await wait(3e3);
+
+  await channelRepo.leave();
 }
 
 export async function tryConnection() {

@@ -2,7 +2,6 @@ package io.jokester.scala_server_playground.ws
 
 import akka.actor._
 import akka.http.scaladsl.model.ws.TextMessage
-import io.jokester.scala_server_playground.ws.UserActor.OutgoingActor
 
 object UserActor {
   def props() = Props(new UserActor)
@@ -12,6 +11,7 @@ object UserActor {
 }
 
 class UserActor extends Actor with ActorLogging {
+  import UserActor._
 
   var outgoing: Option[ActorRef] = None
 
@@ -33,6 +33,8 @@ class UserActor extends Actor with ActorLogging {
   override def receive: Receive = {
     case OutgoingActor(outgoingActor) =>
       outgoing = Some(outgoingActor)
+    case ConnectionClose =>
+      context.stop(self)
     case tm: TextMessage if tm.isStrict =>
       outgoing.get ! TextMessage(s"you said ${tm.getStrictText}")
   }

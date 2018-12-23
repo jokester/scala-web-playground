@@ -18,8 +18,16 @@ class ChannelActor(uuid: UUID, name: String) extends Actor with ActorLogging wit
   private val thisChannel = Channel(name, uuid)
 
   override def receive: Receive = {
-    case JoinRequest(user, channel, userActor) =>
+    case JoinRequest(user, channel, userActor) if !users.contains(user) =>
       users += user -> userActor
       userActor ! ChannelBroadcast(thisChannel, users.keys.toSeq, Seq())
+      logUsers()
+    case LeaveRequest(user, channelUuid) if users.contains(user) && channelUuid == uuid =>
+      users -= user
+      logUsers()
+  }
+
+  private def logUsers(): Unit = {
+    log.debug("{} users in channel {}", users.size, name)
   }
 }

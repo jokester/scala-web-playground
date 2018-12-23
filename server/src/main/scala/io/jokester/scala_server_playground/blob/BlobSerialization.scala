@@ -4,7 +4,7 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model._
 import akka.util.ByteString
 import com.typesafe.scalalogging.LazyLogging
-import spray.json.{DefaultJsonProtocol, RootJsonFormat}
+import spray.json.{ DefaultJsonProtocol, RootJsonFormat }
 
 trait BlobSerialization extends SprayJsonSupport with DefaultJsonProtocol with LazyLogging {
 

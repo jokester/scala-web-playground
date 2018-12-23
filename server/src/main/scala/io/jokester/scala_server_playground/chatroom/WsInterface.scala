@@ -1,5 +1,7 @@
 package io.jokester.scala_server_playground.chatroom
 
+import java.util.UUID
+
 import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.stream.Materializer
 import io.circe
@@ -45,6 +47,9 @@ trait WsInterface {
         case n if n == "JoinChannel" =>
           UserJoinChannel.decodeUserJoinChannel.decodeJson(json)
             .map(m => UserMessage.JoinChannel(m.cmd.seq, name = m.name))
+        case n if n == "LeaveChannel" =>
+          UserLeaveChannel.decodeUserLeaveChannel.decodeJson(json)
+          .map(m => UserMessage.LeaveChannel(m.cmd.seq, channelUuid = UUID.fromString(m.channelUuid)))
       }
     }
   }
@@ -56,6 +61,7 @@ trait WsInterface {
       case msg: ServerMessage.Fail => msg
       case msg: ServerMessage.Authed => msg
       case msg: ServerMessage.JoinedChannel => msg
+      case msg: ServerMessage.LeftChannel => msg
     }
 
     TextMessage(json.toString())
@@ -88,6 +94,15 @@ trait WsInterface {
         users = joined.users.toIndexedSeq.map(convert),
         history = joined.messages.toIndexedSeq.map(convert)
       ),
+    )
+  }
+
+  private implicit def convert(left: ServerMessage.LeftChannel): Json = {
+    ServerLeftChannel.encodeServerLeftChannel(
+      ServerLeftChannel(
+        chatroomCommand("LeftChannel", left.seq),
+        reason = left.reason
+      )
     )
   }
 

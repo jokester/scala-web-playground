@@ -27,5 +27,6 @@ export async function tryConnection() {
   await repo.startConnect("nick");
   await repo.auth("otp");
   const chan1 = await pipe.sink.joinChannel('chan1');
-  await pipe.sink.sendChat(chan1.channel.uuid, "mesg1");
+  await pipe.sink.leaveChannel(chan1.channel.uuid);
+  // await pipe.sink.sendChat(chan1.channel.uuid, "mesg1");
 }

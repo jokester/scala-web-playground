@@ -1,5 +1,7 @@
 package io.jokester.scala_server_playground.chatroom
 
+import java.util.UUID
+
 object UserMessage {
 
   sealed trait HaveSeq {
@@ -15,8 +17,7 @@ object UserMessage {
 
   case class JoinChannel(seq: Int, name: String) extends FromUser(seq)
 
-  //
-  //  case class LeaveChannel(user: String, room: String, seq: Int) extends FromUser(seq)
-  //
+  case class LeaveChannel(seq: Int, channelUuid: UUID) extends FromUser(seq)
+
   //  case class ChatMessage(user: String, room: String, message: String, seq: Int) extends FromUser(seq)
 }

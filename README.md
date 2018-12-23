@@ -2,57 +2,59 @@
 
 a playground for scala/akka web server
 
-## DBs
+## Apps
 
-run DB servers:
+### chat-room
 
+- (non-persistent) websocket chat room
+- Web UI made with React + MUI
+
+### etc
+
+and some example code to try `akka / scalikejdbc / pgsql / redis` combination
+
+## Dev
+
+### Start DBs
+
+```sh
+# run pgsql / redis containers
+
+cd dev-db && docker-compose up -d
 ```
-cd dev-db
-docker-compose up -d
-```
 
-init db:
+### PgSQL (shell)
 
-```
+```sh
+# create db:
+
 createdb -h 127.0.0.1 -p 65432 --username=pguser scala_playground_dev
 createdb -h 127.0.0.1 -p 65432 --username=pguser scala_playground_test
-```
 
-apply migrations:
+# inspect db:
 
-```
-sbt> flywayMigrate
-sbt> test:flywayMigrate
-```
-
-inspect db:
-
-```
 psql -h 127.0.0.1 -p 65432 --username=pguser scala_playground_dev
 ```
 
-clean db:
+### PgSQL (sbt)
 
 ```
+# apply latest schema:
+
+sbt> flywayMigrate
+sbt> test:flywayMigrate
+
+# clean schema:
+
 sbt> flywayClean
 sbt> test:flywayClean
 ```
 
-
-### PGSQL
-
-
 ### Redis
 
-
-## chat-room
-
-- (non-persistent) websocket chat room
-- web UI made with React + MUI
-
-## hanhuazu
-
-WIP
+```
+redis-cli -p 59379
+```
 
 ## LICENSE
 

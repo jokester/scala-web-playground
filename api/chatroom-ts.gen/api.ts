@@ -253,6 +253,12 @@ export interface ServerChannelBroadcast {
      * @type {string}
      * @memberof ServerChannelBroadcast
      */
+    channelName: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ServerChannelBroadcast
+     */
     channelUuid: string;
     /**
      * 

@@ -147,6 +147,7 @@ trait WsInterface {
   private implicit def convert(channelBroadcast: ServerMessage.ChannelBroadcast): ServerChannelBroadcast = {
     val ServerMessage.ChannelBroadcast(channel, joinedUsers, leftUsers, newMessages) = channelBroadcast
     ServerChannelBroadcast(
+      channelName = channel.name,
       channelUuid = channel.uuid.toString,
       joinedUsers = joinedUsers.map(_.uuid.toString).toIndexedSeq,
       leftUsers = leftUsers.map(_.uuid.toString).toIndexedSeq,

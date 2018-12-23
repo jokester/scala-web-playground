@@ -112,11 +112,12 @@ message Server {
     ChatMessage msg = 2;
   }
   message ChannelBroadcast {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["channelUuid", "joinedUsers", "leftUsers", "newMessages" ] } };
-    string channelUuid               = 1;
-    repeated string joinedUsers      = 2;
-    repeated string leftUsers        = 3;
-    repeated ChatMessage newMessages = 4;
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["channelName", "channelUuid", "joinedUsers", "leftUsers", "newMessages" ] } };
+    string channelName               = 1;
+    string channelUuid               = 2;
+    repeated string joinedUsers      = 3;
+    repeated string leftUsers        = 4;
+    repeated ChatMessage newMessages = 5;
   }
   message Broadcast {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "channels", "newUsers"] } };

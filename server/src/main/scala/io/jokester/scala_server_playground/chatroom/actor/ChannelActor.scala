@@ -15,7 +15,7 @@ class ChannelActor(thisChannel: Channel) extends Actor with ActorLogging with Ac
   private var users = Map.empty[User, ActorRef]
 
   override def receive: Receive = {
-    case JoinRequest(user, channel, userActor) if !users.contains(user) =>
+    case JoinRequest(user, _, userActor) if !users.contains(user) =>
       users += user -> userActor
       userActor ! ChannelBroadcast(thisChannel, users.keys.toSeq, Seq())
       logUsers()

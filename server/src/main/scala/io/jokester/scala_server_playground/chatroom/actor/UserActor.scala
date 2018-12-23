@@ -55,7 +55,7 @@ class UserActor(uuid: UUID, daemon: ActorRef) extends Actor with ActorLogging wi
         Seq(channel),
         messages)
     case UserMessage.LeaveChannel(seq, channelUuid) if channelsJoined.contains(channelUuid) =>
-      channelsJoined(channelUuid) ! LeaveRequest(userIdentity.get, channelUuid)
+      daemon ! LeaveRequest(userIdentity.get, channelUuid)
       outgoing.get ! ServerMessage.LeftChannel(seq, "voluntarily")
       channelsJoined -= channelUuid
 

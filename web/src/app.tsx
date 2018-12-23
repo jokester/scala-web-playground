@@ -1,9 +1,9 @@
 import * as React from "react";
 import { DemoLayout } from "./ui/sketch/demo-layout";
 import { getWebpackEnv } from "./util";
-import { AppRepo } from "./repo";
+import { AppRepo } from "./repo/app-repo";
 import { createEventPipe } from "./realworld/ws-event-pipe";
-import { wait } from "ts-commonutil/async";
+import { wait } from "./commonutil/async";
 
 export class App extends React.Component {
   render(): React.ReactNode {

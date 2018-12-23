@@ -15,3 +15,11 @@ services:
     ports:
       - 65432:5432
     restart: always
+
+  redis:
+    image: redis:5.0-alpine
+    volumes:
+      - scala-server-redis-dev:/var/lib/postgresql/data
+    ports:
+      - 59379:6379
+    restart: always

@@ -3,7 +3,7 @@ package io.jokester.scala_server_playground.chatroom.actor
 import java.util.UUID
 
 import akka.actor._
-import io.jokester.scala_server_playground.chatroom.{Internal, ServerMessage, UserMessage}
+import io.jokester.scala_server_playground.chatroom.{ Internal, ServerMessage, UserMessage }
 import io.jokester.scala_server_playground.util.ActorLifecycleLogging
 
 object UserActor {
@@ -37,6 +37,7 @@ class UserActor(uuid: UUID, daemon: ActorRef) extends Actor with ActorLogging wi
       val userInfo = User(name, uuid)
       this.userInfo = Some(userInfo)
       outgoing.get ! Authed(seq, userInfo)
+      daemon ! UserAuthed(userInfo)
       context become authed
   }
 
@@ -44,11 +45,11 @@ class UserActor(uuid: UUID, daemon: ActorRef) extends Actor with ActorLogging wi
     case UserMessage.JoinChannel(seq: Int, name: String) =>
       joiningRoom += name -> seq
       daemon ! JoinRequest(from = userInfo.get, name, self)
-    case b@ChannelBroadcast(channel, users, messages) if joiningRoom.contains(channel.name) =>
+    case b @ ChannelBroadcast(channel, users, messages) if joiningRoom.contains(channel.name) =>
       outgoing.get ! JoinedChannel(joiningRoom(channel.name), channel, users, messages)
       joinedRoom += channel.uuid -> sender
       joiningRoom -= channel.name
-    case b@ChannelBroadcast(channel, users, messages) if joinedRoom.contains(channel.uuid) =>
+    case b @ ChannelBroadcast(channel, users, messages) if joinedRoom.contains(channel.uuid) =>
       nextServerSeq -= 1
       outgoing.get ! ServerMessage.BroadCast(
         nextServerSeq,

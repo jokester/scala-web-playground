@@ -8,6 +8,8 @@ object Internal {
 
   case class UserConnected(outgoingActor: ActorRef)
 
+  case class UserAuthed(user: User)
+
   case class UserDisconnected(userUuid: UUID)
 
   case class User(name: String, uuid: UUID)

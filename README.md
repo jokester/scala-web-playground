@@ -1,6 +1,6 @@
-# scala-server-playground
+# scala-web-playground
 
-a playground for scala/akka server
+a playground for scala/akka web server
 
 ## DBs
 
@@ -47,7 +47,7 @@ sbt> test:flywayClean
 
 ## chat-room
 
-- websocket chat room
+- (non-persistent) websocket chat room
 - web UI made with React + MUI
 
 ## hanhuazu

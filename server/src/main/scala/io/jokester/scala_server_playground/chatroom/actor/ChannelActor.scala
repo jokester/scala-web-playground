@@ -20,24 +20,41 @@ class ChannelActor(thisChannel: Channel) extends Actor with ActorLogging with Ac
       users += user -> userActor
       userSet += user
       userActor ! ChannelBroadcast(thisChannel, userSet, /* FIXME: recent messages */ Seq())
-      logUsers()
+      onUsersChange()
 
     case LeaveRequest(user, channelUuid) if users.contains(user) && channelUuid == thisChannel.uuid =>
-      users -= user
-      userSet -= user
-      logUsers()
+      removeUser(user)
+      onUsersChange()
 
     case SendMessageRequest(user, chatMsg) if users.contains(user) && chatMsg.channelUuid == thisChannel.uuid =>
+      // TODO: persist message?
       sender ! SendMessageResponse(chatMsg.uuid)
       val broadcast = ChannelBroadcast(thisChannel, userSet, Seq(chatMsg))
       for ((_, userActor) <- users) {
         userActor ! broadcast
       }
 
-    // TODO: handle UserDisconnected
+    case UserDisconnected(userUuid) =>
+      for (user <- userSet.find(u => u.uuid == userUuid)) {
+        removeUser(user)
+      }
+      onUsersChange()
   }
 
-  private def logUsers(): Unit = {
+  private def removeUser(user: User): Unit = {
+    users -= user
+    userSet -= user
+  }
+
+  private def onUsersChange(): Unit = {
     log.debug("{} users in channel {}", users.size, thisChannel.name)
+    val broadcast = ChannelBroadcast(thisChannel, userSet, Nil)
+    for ((_, userActor) <- users) {
+      userActor ! broadcast
+    }
+
+    if (users.isEmpty) {
+      context.stop(self)
+    }
   }
 }

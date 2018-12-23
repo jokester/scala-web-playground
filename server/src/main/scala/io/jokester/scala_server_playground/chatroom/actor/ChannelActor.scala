@@ -22,6 +22,9 @@ class ChannelActor(thisChannel: Channel) extends Actor with ActorLogging with Ac
     case LeaveRequest(user, channelUuid) if users.contains(user) && channelUuid == thisChannel.uuid =>
       users -= user
       logUsers()
+    case SendMessageRequest(user, chatMsg) if users.contains(user) && chatMsg.channelUuid == thisChannel.uuid =>
+      sender ! SendMessageResponse(chatMsg.uuid)
+    // TODO: broadcast message
   }
 
   private def logUsers(): Unit = {

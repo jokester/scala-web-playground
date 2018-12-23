@@ -110,10 +110,9 @@ message Server {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "msg"] } };
     Command     cmd = 1;
     ChatMessage msg = 2;
-
   }
   message Broadcast {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["method", "channels", "messages"] } };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "channels", "messages"] } };
     Command cmd = 1;
     repeated ChannelInfo channels = 2;
     repeated ChatMessage messages = 3;

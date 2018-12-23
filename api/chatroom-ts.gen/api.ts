@@ -227,7 +227,7 @@ export interface ServerBroadcast {
      * @type {ChatroomCommand}
      * @memberof ServerBroadcast
      */
-    cmd?: ChatroomCommand;
+    cmd: ChatroomCommand;
     /**
      * 
      * @type {Array&lt;ChatroomChannelInfo&gt;}

@@ -17,6 +17,8 @@ object ServerMessage {
 
   case class LeftChannel(seq: Int, reason: String) extends ToUser(seq)
 
+  case class SentMessage(seq: Int, msg: ChatMessage) extends ToUser(seq)
+
   case class BroadCast(seq: Int, users: Seq[User], channels: Seq[Channel], messages: Seq[ChatMessage]) extends ToUser(seq)
 
 }

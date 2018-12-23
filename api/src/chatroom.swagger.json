@@ -219,7 +219,7 @@
         }
       },
       "required": [
-        "method",
+        "cmd",
         "channels",
         "messages"
       ]

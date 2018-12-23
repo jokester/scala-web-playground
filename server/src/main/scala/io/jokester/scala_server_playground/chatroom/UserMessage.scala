@@ -18,6 +18,4 @@ object UserMessage {
   case class JoinChannel(seq: Int, name: String) extends FromUser(seq)
 
   case class LeaveChannel(seq: Int, channelUuid: UUID) extends FromUser(seq)
-
-  //  case class ChatMessage(user: String, room: String, message: String, seq: Int) extends FromUser(seq)
 }

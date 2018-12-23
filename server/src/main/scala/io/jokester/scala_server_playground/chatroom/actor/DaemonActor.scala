@@ -7,7 +7,15 @@ object DaemonActor {
   def props(e: Entropy) = Props(new DaemonActor(e))
 }
 
-// singleton daemon: create chatrooms and guide user to requested chatroom
+/**
+  *
+  * singleton daemon:
+  * - create channels and
+  * - forward join request to the channel
+  * - notice channels after user disconnected
+  *
+  * @param e
+  */
 class DaemonActor(e: Entropy) extends Actor with ActorLogging with ActorLifecycleLogging {
 
   import io.jokester.scala_server_playground.chatroom.Internal._
@@ -49,7 +57,7 @@ class DaemonActor(e: Entropy) extends Actor with ActorLogging with ActorLifecycl
     } else {
       val newChannel = context.actorOf(
         ChannelActor.props(e.nextUUID(), name),
-        name = s"chatroom-$name")
+        name = s"ChannelActor-$name")
       channelName2Actor += name -> newChannel
       newChannel
     }

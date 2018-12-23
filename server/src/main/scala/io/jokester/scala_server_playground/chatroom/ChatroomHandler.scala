@@ -30,7 +30,7 @@ class ChatroomHandler(implicit system: ActorSystem, implicit val entropy: Entrop
     val userUuid = entropy.nextUUID()
     val userActor = system.actorOf(
       UserActor.props(userUuid, daemon),
-      s"user-$userUuid"
+      s"UserActor-$userUuid"
     )
 
     val incoming = Flow[Message]

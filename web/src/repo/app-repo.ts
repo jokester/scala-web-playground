@@ -1,21 +1,30 @@
-import { ChannelStore, ChannelRepo } from "./channel-repo";
+import { ChannelRepo, ChannelStore } from "./channel-repo";
 import { action, observable, runInAction } from "mobx";
 import { WsState } from "../realworld/ws-connection";
 import { createEventPipe } from "../realworld/ws-event-pipe";
+import { ServerBroadcast } from "../../src-gen";
+import { Model } from "../model";
+import { getLogger } from "../util";
+import { Debug } from "../util/debug";
 
 export interface AppStore {
   connStatus: WsState;
-  nickname?: string;
+  identity?: Model.User;
   channels: Map<string, ChannelStore>;
 }
+
+const logger = getLogger(__filename);
 
 export class AppRepo {
 
   @observable
   readonly appState: AppStore = {
     connStatus: WsState.inited,
+    identity: undefined,
     channels: observable(new Map<string, ChannelStore>()),
   };
+
+  private readonly userPool = new Map<string, Model.User>();
 
   private readonly channelRepos = new Map<string, ChannelRepo>();
 
@@ -33,31 +42,49 @@ export class AppRepo {
     conn.on("message", (m: unknown) => {
       source.feedMsg(m);
     });
+    source.on("broadcast", (m: ServerBroadcast) => {
+      for (const u of m.newUsers) {
+        this.userPool.set(u.uuid, u);
+      }
+      for (const c of m.channels) {
+        if (this.channelRepos.has(c.channelName)) {
+          const channelRepo = this.channelRepos.get(c.channelName)!;
+          channelRepo.onChannelBroadcast(c);
+        }
+      }
+    });
   }
 
   @action
-  startConnect(nickname: string) {
+  startConnect() {
+    Debug.assert(this.appState.connStatus === WsState.inited, "already started connection");
     const { conn } = this.pipe;
-    this.appState.nickname = nickname;
     conn.startConnect();
 
     return conn.waitConnect();
   }
 
-  async auth(otp: string) {
+  async auth(name: string, otp: string) {
     const { conn, sink } = this.pipe;
     await conn.waitConnect();
-    await sink.userAuth(this.appState.nickname!, otp);
+    const authed = await sink.userAuth(name, otp);
+    runInAction(() => {
+      this.appState.identity = authed.identity;
+    });
+    return { ...authed.identity };
   }
 
   @action
-  getChannelRepo(channel: string) {
-    if (!this.channelRepos.has(channel)) {
+  getChannelRepo(channelName: string) {
+    Debug.assert(
+      this.appState.connStatus === WsState.connected && this.appState.identity,
+      "getChannelRepo() required auth");
+    if (!this.channelRepos.has(channelName)) {
       const { conn, source, sink } = this.pipe;
-      const newRepo = new ChannelRepo(channel, conn, source, sink);
-      this.channelRepos.set(channel, newRepo);
-      this.appState.channels.set(channel, newRepo);
+      const newRepo = new ChannelRepo(channelName, this.appState.identity!, this.userPool, conn, source, sink);
+      this.channelRepos.set(channelName, newRepo);
+      this.appState.channels.set(channelName, newRepo);
     }
-    return this.channelRepos.get(channel)!;
+    return this.channelRepos.get(channelName)!;
   }
 }

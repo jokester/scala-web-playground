@@ -227,6 +227,9 @@
     "ServerChannelBroadcast": {
       "type": "object",
       "properties": {
+        "channelName": {
+          "type": "string"
+        },
         "channelUuid": {
           "type": "string"
         },
@@ -250,6 +253,7 @@
         }
       },
       "required": [
+        "channelName",
         "channelUuid",
         "joinedUsers",
         "leftUsers",

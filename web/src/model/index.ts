@@ -1,17 +1,18 @@
 export namespace Model {
+  const nonnull = 0;
 
   export interface ChatMessage {
     uuid: string;
-    content: string;
-    author: Human;
-    sentAt: Time | null;
+    userUuid: string;
+    channelUuid: string;
+    text: string;
+    timestamp?: string;
+    // true when failed to send messages
+    failed?: boolean;
   }
 
-  export interface Human {
-    nickname: string;
-  }
-
-  export interface Time {
-    timestamp: number;
+  export interface User {
+    uuid: string;
+    name: string;
   }
 }

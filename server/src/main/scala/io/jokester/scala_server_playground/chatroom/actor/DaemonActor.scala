@@ -17,13 +17,17 @@ class DaemonActor(e: Entropy) extends Actor with ActorLogging with ActorLifecycl
   override def receive: Receive = {
     case join @ JoinRequest(_, channel, _) =>
       channelOfName(channel) ! join
+    //    case m =>
+    //      log.warning("unhandled message: {}", m)
   }
 
   private def channelOfName(name: String): ActorRef = {
     if (channels.contains(name)) {
       channels(name)
     } else {
-      val newChannel = context.actorOf(ChannelActor.props(e.nextUUID(), name))
+      val newChannel = context.actorOf(
+        ChannelActor.props(e.nextUUID(), name),
+        name = s"chatroom-$name")
       channels += name -> newChannel
       newChannel
     }

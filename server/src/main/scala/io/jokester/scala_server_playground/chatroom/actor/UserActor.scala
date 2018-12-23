@@ -44,11 +44,11 @@ class UserActor(uuid: UUID, daemon: ActorRef) extends Actor with ActorLogging wi
     case UserMessage.JoinChannel(seq: Int, name: String) =>
       joiningRoom += name -> seq
       daemon ! JoinRequest(from = userInfo.get, name, self)
-    case b @ Broadcast(channel, users, messages) if joiningRoom.contains(channel.name) =>
+    case b @ ChannelBroadcast(channel, users, messages) if joiningRoom.contains(channel.name) =>
       outgoing.get ! JoinedChannel(joiningRoom(channel.name), channel, users, messages)
       joinedRoom += channel.uuid -> sender
       joiningRoom -= channel.name
-    case b @ Broadcast(channel, users, messages) if joinedRoom.contains(channel.uuid) =>
+    case b @ ChannelBroadcast(channel, users, messages) if joinedRoom.contains(channel.uuid) =>
       nextServerSeq -= 1
       outgoing.get ! ServerMessage.BroadCast(
         nextServerSeq,
@@ -58,6 +58,10 @@ class UserActor(uuid: UUID, daemon: ActorRef) extends Actor with ActorLogging wi
   }
 
   private def handlePing: Receive = {
+    case disconn: UserDisconnected if disconn.userUuid == uuid =>
+      log.debug("user disconnected, stopping")
+      daemon ! disconn
+      context.stop(self)
     case Ping(seqNo) =>
       outgoing.get ! Pong(seqNo)
   }
@@ -70,10 +74,5 @@ class UserActor(uuid: UUID, daemon: ActorRef) extends Actor with ActorLogging wi
 
   private def wrapContext(inner: Receive): Receive = {
     handlePing orElse inner orElse catchUnhandledSeq
-  }
-
-  override def postStop(): Unit = {
-    daemon ! UserDisconnected(uuid)
-    super.postStop()
   }
 }

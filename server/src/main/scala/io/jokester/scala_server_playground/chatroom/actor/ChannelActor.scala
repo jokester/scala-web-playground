@@ -19,6 +19,6 @@ class ChannelActor(uuid: UUID, name: String) extends Actor with ActorLogging wit
   override def receive: Receive = {
     case JoinRequest(user, channel, userActor) =>
       users += user -> userActor
-      userActor ! Broadcast(thisChannel, users.keys.toSeq, Seq())
+      userActor ! ChannelBroadcast(thisChannel, users.keys.toSeq, Seq())
   }
 }

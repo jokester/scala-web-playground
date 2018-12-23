@@ -28,7 +28,10 @@ class ChatroomHandler(implicit system: ActorSystem, implicit val entropy: Entrop
 
     // FIXME: userActor is not stopped until server down
     val userUuid = entropy.nextUUID()
-    val userActor = system.actorOf(UserActor.props(userUuid, daemon))
+    val userActor = system.actorOf(
+      UserActor.props(userUuid, daemon),
+      s"user-$userUuid"
+    )
 
     val incoming = Flow[Message]
       .mapAsync(1)(retrieveCompleteMessage)
@@ -41,12 +44,12 @@ class ChatroomHandler(implicit system: ActorSystem, implicit val entropy: Entrop
       //      .filter(_.isRight)
       //      .map(_.right.get)
       .flatMapConcat { decoded =>
-      decoded.fold(
-        _ => Source.empty,
-        msg => Source.single(msg),
-      )
-    }
-      .to(Sink.actorRef(userActor, PoisonPill))
+        decoded.fold(
+          _ => Source.empty,
+          msg => Source.single(msg),
+        )
+      }
+      .to(Sink.actorRef(userActor, UserDisconnected(userUuid)))
 
     val outgoing =
       Source.actorRef[ServerMessage.ToUser](10, OverflowStrategy.fail)

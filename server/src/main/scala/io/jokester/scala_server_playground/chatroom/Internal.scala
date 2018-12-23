@@ -8,7 +8,7 @@ object Internal {
 
   case class UserConnected(outgoingActor: ActorRef)
 
-  case class UserDisconnected(uuid: UUID)
+  case class UserDisconnected(userUuid: UUID)
 
   case class User(name: String, uuid: UUID)
 
@@ -18,5 +18,5 @@ object Internal {
 
   case class JoinRequest(from: User, channel: String, userActor: ActorRef)
 
-  case class Broadcast(from: Channel, users: Seq[User], messages: Seq[ChatMessage])
+  case class ChannelBroadcast(from: Channel, users: Seq[User], messages: Seq[ChatMessage])
 }

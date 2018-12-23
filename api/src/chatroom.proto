@@ -111,11 +111,18 @@ message Server {
     Command     cmd = 1;
     ChatMessage msg = 2;
   }
+  message ChannelBroadcast {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["channelUuid", "joinedUsers", "leftUsers", "newMessages" ] } };
+    string channelUuid               = 1;
+    repeated string joinedUsers      = 2;
+    repeated string leftUsers        = 3;
+    repeated ChatMessage newMessages = 4;
+  }
   message Broadcast {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "channels", "messages"] } };
-    Command cmd = 1;
-    repeated ChannelInfo channels = 2;
-    repeated ChatMessage messages = 3;
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "channels", "newUsers"] } };
+    Command cmd                        = 1;
+    repeated ChannelBroadcast channels = 2;
+    repeated UserInfo newUsers         = 3;
   }
 }
 

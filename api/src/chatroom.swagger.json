@@ -208,10 +208,41 @@
         "channels": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chatroomChannelInfo"
+            "$ref": "#/definitions/ServerChannelBroadcast"
           }
         },
-        "messages": {
+        "newUsers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chatroomUserInfo"
+          }
+        }
+      },
+      "required": [
+        "cmd",
+        "channels",
+        "newUsers"
+      ]
+    },
+    "ServerChannelBroadcast": {
+      "type": "object",
+      "properties": {
+        "channelUuid": {
+          "type": "string"
+        },
+        "joinedUsers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "leftUsers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "newMessages": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chatroomChatMessage"
@@ -219,9 +250,10 @@
         }
       },
       "required": [
-        "cmd",
-        "channels",
-        "messages"
+        "channelUuid",
+        "joinedUsers",
+        "leftUsers",
+        "newMessages"
       ]
     },
     "ServerJoinedChannel": {

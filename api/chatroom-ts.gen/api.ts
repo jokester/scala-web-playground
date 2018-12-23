@@ -230,16 +230,48 @@ export interface ServerBroadcast {
     cmd: ChatroomCommand;
     /**
      * 
-     * @type {Array&lt;ChatroomChannelInfo&gt;}
+     * @type {Array&lt;ServerChannelBroadcast&gt;}
      * @memberof ServerBroadcast
      */
-    channels: Array<ChatroomChannelInfo>;
+    channels: Array<ServerChannelBroadcast>;
+    /**
+     * 
+     * @type {Array&lt;ChatroomUserInfo&gt;}
+     * @memberof ServerBroadcast
+     */
+    newUsers: Array<ChatroomUserInfo>;
+}
+
+/**
+ * 
+ * @export
+ * @interface ServerChannelBroadcast
+ */
+export interface ServerChannelBroadcast {
+    /**
+     * 
+     * @type {string}
+     * @memberof ServerChannelBroadcast
+     */
+    channelUuid: string;
+    /**
+     * 
+     * @type {Array&lt;string&gt;}
+     * @memberof ServerChannelBroadcast
+     */
+    joinedUsers: Array<string>;
+    /**
+     * 
+     * @type {Array&lt;string&gt;}
+     * @memberof ServerChannelBroadcast
+     */
+    leftUsers: Array<string>;
     /**
      * 
      * @type {Array&lt;ChatroomChatMessage&gt;}
-     * @memberof ServerBroadcast
+     * @memberof ServerChannelBroadcast
      */
-    messages: Array<ChatroomChatMessage>;
+    newMessages: Array<ChatroomChatMessage>;
 }
 
 /**

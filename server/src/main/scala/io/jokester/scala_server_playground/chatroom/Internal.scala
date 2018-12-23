@@ -19,4 +19,5 @@ object Internal {
   case class JoinRequest(from: User, channel: String, userActor: ActorRef)
 
   case class ChannelBroadcast(from: Channel, users: Seq[User], messages: Seq[ChatMessage])
+
 }

@@ -21,7 +21,9 @@ class WsEchoHandler(implicit system: ActorSystem) extends LazyLogging {
     val userActor = system.actorOf(UserActor.props(), userName)
 
     val incoming = Flow[Message]
-      .wireTap { logger.debug("incoming message {}", _) }
+      .wireTap {
+        logger.debug("incoming message {}", _)
+      }
       .collect { case tm: TextMessage if tm.isStrict => tm }
       .to(Sink.actorRef(userActor, ConnectionClose))
 
@@ -29,7 +31,9 @@ class WsEchoHandler(implicit system: ActorSystem) extends LazyLogging {
       .mapMaterializedValue { outgoingActor =>
         userActor ! UserActor.OutgoingActor(outgoingActor)
       }
-      .wireTap { logger.debug("outgoing message {}", _) }
+      .wireTap {
+        logger.debug("outgoing message {}", _)
+      }
 
     Flow.fromSinkAndSource(incoming, outgoing)
   }

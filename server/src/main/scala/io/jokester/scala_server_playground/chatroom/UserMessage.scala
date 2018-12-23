@@ -14,6 +14,7 @@ object UserMessage {
   case class Auth(seq: Int, name: String, otp: String) extends FromUser(seq)
 
   case class JoinChannel(seq: Int, name: String) extends FromUser(seq)
+
   //
   //  case class LeaveChannel(user: String, room: String, seq: Int) extends FromUser(seq)
   //

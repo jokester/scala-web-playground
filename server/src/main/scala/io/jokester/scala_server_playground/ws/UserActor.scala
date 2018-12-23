@@ -7,10 +7,13 @@ object UserActor {
   def props() = Props(new UserActor)
 
   case class OutgoingActor(actor: ActorRef)
+
   case object ConnectionClose
+
 }
 
 class UserActor extends Actor with ActorLogging {
+
   import UserActor._
 
   var outgoing: Option[ActorRef] = None

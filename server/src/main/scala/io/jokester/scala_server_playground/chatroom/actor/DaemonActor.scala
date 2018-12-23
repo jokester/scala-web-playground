@@ -1,7 +1,7 @@
 package io.jokester.scala_server_playground.chatroom.actor
 
 import akka.actor._
-import io.jokester.scala_server_playground.util.{ ActorLifecycleLogging, Entropy }
+import io.jokester.scala_server_playground.util.{ActorLifecycleLogging, Entropy}
 
 object DaemonActor {
   def props(e: Entropy) = Props(new DaemonActor(e))
@@ -13,9 +13,11 @@ class DaemonActor(e: Entropy) extends Actor with ActorLogging with ActorLifecycl
   import io.jokester.scala_server_playground.chatroom.Internal._
 
   var channels: Map[String, ActorRef] = Map.empty
+  var joinedChannel: Map[User, String] = Map.empty
 
   override def receive: Receive = {
-    case join @ JoinRequest(_, channel, _) =>
+    case join@JoinRequest(user, channel, _) =>
+      joinedChannel += user -> channel
       channelOfName(channel) ! join
     //    case m =>
     //      log.warning("unhandled message: {}", m)

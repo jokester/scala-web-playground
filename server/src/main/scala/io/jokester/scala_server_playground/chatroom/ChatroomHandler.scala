@@ -1,7 +1,7 @@
 package io.jokester.scala_server_playground.chatroom
 
 import akka.NotUsed
-import akka.actor.{ActorSystem, PoisonPill}
+import akka.actor.ActorSystem
 import akka.http.scaladsl.model.ws.Message
 import akka.http.scaladsl.server.Directives.{get, handleWebSocketMessages, path, _}
 import akka.http.scaladsl.server.Route
@@ -44,11 +44,11 @@ class ChatroomHandler(implicit system: ActorSystem, implicit val entropy: Entrop
       //      .filter(_.isRight)
       //      .map(_.right.get)
       .flatMapConcat { decoded =>
-        decoded.fold(
-          _ => Source.empty,
-          msg => Source.single(msg),
-        )
-      }
+      decoded.fold(
+        _ => Source.empty,
+        msg => Source.single(msg),
+      )
+    }
       .to(Sink.actorRef(userActor, UserDisconnected(userUuid)))
 
     val outgoing =

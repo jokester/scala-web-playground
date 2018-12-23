@@ -16,4 +16,5 @@ object ServerMessage {
     extends ToUser(seq)
 
   case class BroadCast(seq: Int, users: Seq[User], channels: Seq[Channel], messages: Seq[ChatMessage])
+
 }

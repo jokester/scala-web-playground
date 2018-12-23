@@ -3,7 +3,7 @@ package io.jokester.scala_server_playground.chatroom.actor
 import java.util.UUID
 
 import akka.actor._
-import io.jokester.scala_server_playground.chatroom.{ Internal, ServerMessage, UserMessage }
+import io.jokester.scala_server_playground.chatroom.{Internal, ServerMessage, UserMessage}
 import io.jokester.scala_server_playground.util.ActorLifecycleLogging
 
 object UserActor {
@@ -44,11 +44,11 @@ class UserActor(uuid: UUID, daemon: ActorRef) extends Actor with ActorLogging wi
     case UserMessage.JoinChannel(seq: Int, name: String) =>
       joiningRoom += name -> seq
       daemon ! JoinRequest(from = userInfo.get, name, self)
-    case b @ ChannelBroadcast(channel, users, messages) if joiningRoom.contains(channel.name) =>
+    case b@ChannelBroadcast(channel, users, messages) if joiningRoom.contains(channel.name) =>
       outgoing.get ! JoinedChannel(joiningRoom(channel.name), channel, users, messages)
       joinedRoom += channel.uuid -> sender
       joiningRoom -= channel.name
-    case b @ ChannelBroadcast(channel, users, messages) if joinedRoom.contains(channel.uuid) =>
+    case b@ChannelBroadcast(channel, users, messages) if joinedRoom.contains(channel.uuid) =>
       nextServerSeq -= 1
       outgoing.get ! ServerMessage.BroadCast(
         nextServerSeq,
@@ -57,22 +57,22 @@ class UserActor(uuid: UUID, daemon: ActorRef) extends Actor with ActorLogging wi
         messages)
   }
 
-  private def handlePing: Receive = {
-    case disconn: UserDisconnected if disconn.userUuid == uuid =>
+  private def hookBeforeReceive: Receive = {
+    case m: UserDisconnected if m.userUuid == uuid =>
       log.debug("user disconnected, stopping")
-      daemon ! disconn
+      daemon ! m
       context.stop(self)
     case Ping(seqNo) =>
       outgoing.get ! Pong(seqNo)
   }
 
-  private def catchUnhandledSeq: Receive = {
+  private def hookAfterReceive: Receive = {
     case m: FromUser =>
       log.warning("unhandled message: {}", m.seq)
       outgoing.get ! Fail(m.seq, Seq("unhandled message"))
   }
 
   private def wrapContext(inner: Receive): Receive = {
-    handlePing orElse inner orElse catchUnhandledSeq
+    hookBeforeReceive orElse inner orElse hookAfterReceive
   }
 }

@@ -1,14 +1,15 @@
-import { ChannelStore, ChannelRepo } from "./channel-repo";
+import { ChannelRepo, ChannelStore } from "./channel-repo";
 import { action, observable, runInAction } from "mobx";
 import { WsState } from "../realworld/ws-connection";
 import { createEventPipe } from "../realworld/ws-event-pipe";
 import { ServerBroadcast } from "../../src-gen";
 import { Model } from "../model";
 import { getLogger } from "../util";
+import { Debug } from "../util/debug";
 
 export interface AppStore {
   connStatus: WsState;
-  nickname?: string;
+  identity?: Model.User;
   channels: Map<string, ChannelStore>;
 }
 
@@ -19,6 +20,7 @@ export class AppRepo {
   @observable
   readonly appState: AppStore = {
     connStatus: WsState.inited,
+    identity: undefined,
     channels: observable(new Map<string, ChannelStore>()),
   };
 
@@ -54,25 +56,32 @@ export class AppRepo {
   }
 
   @action
-  startConnect(nickname: string) {
+  startConnect() {
+    Debug.assert(this.appState.connStatus === WsState.inited, "already started connection");
     const { conn } = this.pipe;
-    this.appState.nickname = nickname;
     conn.startConnect();
 
     return conn.waitConnect();
   }
 
-  async auth(otp: string) {
+  async auth(name: string, otp: string) {
     const { conn, sink } = this.pipe;
     await conn.waitConnect();
-    await sink.userAuth(this.appState.nickname!, otp);
+    const authed = await sink.userAuth(name, otp);
+    runInAction(() => {
+      this.appState.identity = authed.identity;
+    });
+    return { ...authed.identity };
   }
 
   @action
   getChannelRepo(channelName: string) {
+    Debug.assert(
+      this.appState.connStatus === WsState.connected && this.appState.identity,
+      "getChannelRepo() required auth");
     if (!this.channelRepos.has(channelName)) {
       const { conn, source, sink } = this.pipe;
-      const newRepo = new ChannelRepo(channelName, this.userPool, conn, source, sink);
+      const newRepo = new ChannelRepo(channelName, this.appState.identity!, this.userPool, conn, source, sink);
       this.channelRepos.set(channelName, newRepo);
       this.appState.channels.set(channelName, newRepo);
     }

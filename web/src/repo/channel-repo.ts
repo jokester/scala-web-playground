@@ -4,23 +4,23 @@ import { getLogger } from "../util";
 import { WsEventSource } from "../realworld/ws-event-source";
 import { WsEventSink } from "../realworld/ws-event-sink";
 import { WsConnection } from "../realworld/ws-connection";
-import { ChatroomChatMessage, ChatroomUserInfo, ServerChannelBroadcast, ServerJoinedChannel } from "../../src-gen";
+import { ChatroomChatMessage, ServerChannelBroadcast, ServerJoinedChannel } from "../../src-gen";
 import { Debug } from "../util/debug";
+import { nonce8 } from "../util/string-util";
 
 const logger = getLogger(__filename);
 
 export interface ChannelStore {
   state: ChannelState;
-  messageUuids: ReadonlySet<string>;
-  latestMessageUuid?: string;
+  messages: ReadonlyMap<string, Model.ChatMessage>;
   userUuids: ReadonlyArray<string>;
-  userPool: ReadonlyMap<string, Model.User>;
+  userPool: ReadonlyMap<string, Readonly<Model.User>>;
 }
 
 export enum ChannelState {
-  joining = 1,
-  joined = 2,
-  left = 3,
+  joining = "ChannelState.joining",
+  joined = "ChannelState.joined",
+  left = "ChannelState.left",
 }
 
 /**
@@ -34,18 +34,17 @@ export class ChannelRepo implements ChannelStore {
   @observable
   latestMessageUuid?: string = undefined;
 
-  // FIXME: change to sorted (by time) keys of messagePool.keys()
-  messageUuids = new Set<string>();
-
-  readonly messagePool = new Map<string, Model.ChatMessage>();
+  @observable
+  readonly messages = new Map<string, Model.ChatMessage>();
 
   @observable.ref
   userUuids: string[] = [];
 
   private uuid?: string;
 
-  constructor(readonly name: string,
-              readonly userPool: Map<string, ChatroomUserInfo>,
+  constructor(readonly channelName: string,
+              private readonly userIdentity: Readonly<Model.User>,
+              readonly userPool: Map<string, Readonly<Model.User>>,
               private readonly conn: WsConnection,
               private readonly eventSrc: WsEventSource,
               private readonly eventSink: WsEventSink) {
@@ -56,7 +55,7 @@ export class ChannelRepo implements ChannelStore {
     this.assertState(ChannelState.left, "expected ChannelState.left");
     this.state = ChannelState.joining;
     try {
-      const joined = await this.eventSink.joinChannel(name);
+      const joined = await this.eventSink.joinChannel(this.channelName);
       this.onJoined(joined);
     } catch (e) {
       runInAction(() => this.state = ChannelState.left);
@@ -64,8 +63,35 @@ export class ChannelRepo implements ChannelStore {
   }
 
   @action
+  async sendMessage(text: string) {
+    this.assertState(ChannelState.joined);
+
+    const tmpMessage: Model.ChatMessage = {
+      text,
+      uuid: nonce8(),
+      userUuid: this.userIdentity.uuid,
+      channelUuid: this.uuid!,
+    };
+
+    this.messages.set(tmpMessage.uuid, tmpMessage);
+
+    try {
+      const { msg } = await this.eventSink.sendChat(this.uuid!, text);
+      runInAction(() => {
+        this.messages.delete(tmpMessage.uuid);
+        this.messages.set(msg.uuid, mapChatMessage(msg));
+      });
+    } catch (e) {
+      runInAction(() => {
+        tmpMessage.failed = true;
+      });
+    }
+
+  }
+
+  @action
   onChannelBroadcast(b: ServerChannelBroadcast) {
-    Debug.assert(this.uuid === b.channelUuid, "channel uuid mismatch");
+    Debug.assert(this.uuid === b.channelUuid && this.channelName === b.channelName, "channel uuid or channelName mismatch");
 
     if (b.leftUsers.length || b.joinedUsers.length) {
       // merge users
@@ -81,16 +107,14 @@ export class ChannelRepo implements ChannelStore {
 
     for (const m of b.newMessages) {
       // merge messages
-      // FIXME: should prevent duplicate
-      this.messagePool.set(m.uuid, mapChatMessage(m));
-      this.messageUuids.add(m.uuid);
+      this.messages.set(m.uuid, mapChatMessage(m));
       this.latestMessageUuid = m.uuid;
     }
   }
 
   @action
   leave() {
-    this.assertState(ChannelState.joined, "not joined");
+    this.assertState(ChannelState.joined);
     const leave = this.eventSink.leaveChannel(this.uuid!);
     try {
       this.conn.sendMessage(leave);
@@ -105,7 +129,7 @@ export class ChannelRepo implements ChannelStore {
 
   @action
   private onJoined(joined: ServerJoinedChannel) {
-    this.assertState(ChannelState.joining, "expected ChannelState.joining");
+    this.assertState(ChannelState.joining);
     const { channel, users, history } = joined;
 
     this.state = ChannelState.joined;
@@ -118,9 +142,8 @@ export class ChannelRepo implements ChannelStore {
     this.userUuids = users.map(u => u.uuid);
 
     for (const m of history) {
-      if (!this.messagePool.has(m.uuid)) {
-        this.messagePool.set(m.uuid, mapChatMessage(m));
-        this.messageUuids.add(m.uuid);
+      if (!this.messages.has(m.uuid)) {
+        this.messages.set(m.uuid, mapChatMessage(m));
         this.latestMessageUuid = m.uuid;
       }
     }
@@ -128,19 +151,17 @@ export class ChannelRepo implements ChannelStore {
     this.state = ChannelState.joined;
   }
 
-  private assertState(expectedState: ChannelState, message: string) {
+  private assertState(expectedState: ChannelState, message = `expected ChannelState to be ${expectedState}`) {
     Debug.assert(this.state === expectedState, message);
   }
 }
 
 function mapChatMessage(m: ChatroomChatMessage): Model.ChatMessage {
   return ({
+    uuid: m.uuid,
     userUuid: m.userUuid,
     channelUuid: m.channelUuid,
     text: m.text,
-    sent: {
-      uuid: m.uuid,
-      timestamp: m.timestamp,
-    },
+    timestamp: m.timestamp,
   });
 }

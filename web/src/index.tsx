@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
-import { App, createRepo, tryConnection } from './app';
+import { App, createRepo, tryConnection, tryRepo } from './app';
 import * as serviceWorker from './serviceWorker';
 import { getLogger, isProdBuild } from "./util";
 
@@ -40,4 +40,4 @@ if (isProdBuild) {
 registerHMR();
 render();
 
-tryConnection();
+tryRepo();

@@ -21,20 +21,30 @@ export function createRepo() {
 }
 
 export async function tryRepo() {
-  const repo = createRepo();
-  await repo.startConnect("nick");
+  const appRepo = createRepo();
+  await appRepo.startConnect();
 
-  const channelRepo = repo.getChannelRepo("chan1");
+  await appRepo.auth("tryRepo", "otp");
 
+  const channelRepo = appRepo.getChannelRepo("chan1");
+
+  await channelRepo.join();
+
+  await channelRepo.sendMessage("chan1-msg1");
+
+  await wait(3e3);
+
+  await channelRepo.sendMessage("chan1-msg2");
 
 }
 
 export async function tryConnection() {
   const buildEnv = getWebpackEnv<{ REACT_APP_WS_URL: string }>();
   const pipe = createEventPipe(buildEnv.REACT_APP_WS_URL);
-  const repo = new AppRepo(pipe);
-  await repo.startConnect("nick");
-  await repo.auth("otp");
+  const appRepo = new AppRepo(pipe);
+  await appRepo.startConnect();
+  await appRepo.auth("nick", "otp");
+
   const chan1 = await pipe.sink.joinChannel('chan1');
   await pipe.sink.sendChat(chan1.channel.uuid, "mesg1");
   await wait(3e3);

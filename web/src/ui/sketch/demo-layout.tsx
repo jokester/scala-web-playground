@@ -1,67 +1,30 @@
 import * as React from 'react';
-import { createMuiTheme, createStyles, MuiThemeProvider } from '@material-ui/core/styles';
-import purple from '@material-ui/core/colors/purple';
-import green from '@material-ui/core/colors/green';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import withStyles from '@material-ui/core/styles/withStyles';
 import {
-  AppBar, Avatar, Button, Divider, Grid, Icon, List, ListItem, ListItemText, Toolbar, Typography, withWidth, Theme, Paper, CircularProgress
+  AppBar,
+  Avatar,
+  Button,
+  CircularProgress,
+  Grid,
+  Icon,
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
+  Toolbar,
+  Typography,
+  withWidth
 } from "@material-ui/core";
 
-import { Work as WorkIcon, Group as GroupIcon, GroupAdd as GroupAddIcon } from '@material-ui/icons';
-
-const theme = createMuiTheme({
-  palette: {
-    primary: purple,
-    secondary: green,
-  },
-  typography: {
-    useNextVariants: true,
-  },
-  breakpoints: {
-    keys: [
-      // xs: phone (portrait)
-      // [0, 320] dp
-      "xs",
-      // md: phone ( ) / tablet
-      // [320, 640] dp
-      "md",
-      // lg: wider than md
-      // [640, inf] dp
-      "lg",
-    ],
-    values: {
-      xs: 0,
-      sm: NaN,
-      md: 320,
-      lg: 640,
-      xl: NaN,
-    },
-  },
-});
+import { Group as GroupIcon, GroupAdd as GroupAddIcon } from '@material-ui/icons';
+import { injectMuiTheme } from "../theme";
 
 const MyWidth = withWidth()((props: { width: string }) => {
   return <span>Current width: {props.width}</span>;
 });
 
-export function DemoLayout() {
-  const styles = (theme: Theme) =>
-    createStyles({
-      root: {
-        textAlign: 'center',
-        paddingTop: theme.spacing.unit * 20,
-      },
-    });
-  const StyledContent = withStyles(styles)(DemoLayoutContent);
-  return (
-    <MuiThemeProvider theme={theme}>
-      <CssBaseline/>
-      <StyledContent/>
-    </MuiThemeProvider>
-  );
-}
+export const DemoLayout = injectMuiTheme(DemoLayoutContent);
 
-function DemoLayoutContent() {
+function DemoLayoutContent(props: {}) {
   const open = false;
   return (
     <div className="" style={{ height: 'calc(100vh)', display: 'flex', }}>

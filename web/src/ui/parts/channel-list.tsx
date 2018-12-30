@@ -6,6 +6,10 @@ interface ChannelListProps {
   onChannelSelect(channel: string): void;
 }
 
-export class ChannelList extends React.Component {
+interface ChannelListState {
+
+}
+
+export class ChannelList extends React.Component<ChannelList> {
 
 }

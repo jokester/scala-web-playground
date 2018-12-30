@@ -1,11 +1,16 @@
 import { ChannelRepo, ChannelStore } from "./channel-repo";
 import { action, observable, runInAction } from "mobx";
-import { WsState } from "../realworld/ws-connection";
-import { createEventPipe } from "../realworld/ws-event-pipe";
+import { WsState, createEventPipe } from "../realworld";
 import { ServerBroadcast } from "../../src-gen";
 import { Model } from "../model";
-import { getLogger } from "../util";
+import { getLogger, getWebpackEnv } from "../util";
 import { Debug } from "../util/debug";
+
+export function createRepo() {
+  const buildEnv = getWebpackEnv<{ REACT_APP_WS_URL: string }>();
+  const pipe = createEventPipe(buildEnv.REACT_APP_WS_URL);
+  return new AppRepo(pipe);
+}
 
 export interface AppStore {
   connStatus: WsState;

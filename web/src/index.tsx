@@ -1,9 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
-import { App, createRepo, tryConnection, tryRepo } from './app';
+import { DemoApp } from './demo-app';
+import { App } from './app';
 import * as serviceWorker from './serviceWorker';
 import { getLogger, isProdBuild } from "./util";
+import { createRepo } from "./repo/app-repo";
 
 const logger = getLogger(__filename, "debug");
 
@@ -19,12 +21,15 @@ function registerHMR() {
   }
 }
 
+const appRepo = createRepo();
+
 function render() {
   ReactDOM.render(
-    <App/>,
+    <DemoApp/>,
+    // <App appRepo={appRepo}/>,
     document.getElementById('root') as HTMLElement
   );
-  logger.debug("rendered {}", { a: 1 }, process.env);
+  logger.debug("rendered");
 }
 
 if (isProdBuild) {
@@ -37,7 +42,4 @@ if (isProdBuild) {
   registerHMR();
 }
 
-registerHMR();
 render();
-
-tryRepo();

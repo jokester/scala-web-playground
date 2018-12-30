@@ -5,6 +5,7 @@ import { ServerBroadcast } from "../../src-gen";
 import { Model } from "../model";
 import { getLogger, getWebpackEnv } from "../util";
 import { Debug } from "../util/debug";
+import { DeepReadonly } from "../commonutil/type/freeze";
 
 export function createRepo() {
   const buildEnv = getWebpackEnv<{ REACT_APP_WS_URL: string }>();
@@ -18,6 +19,9 @@ export interface AppStore {
   channels: Map<string, ChannelStore>;
 }
 
+// read-only obj pools for UI
+export type UserPool = ReadonlyMap<string, DeepReadonly<Model.User>>;
+
 const logger = getLogger(__filename);
 
 export class AppRepo {
@@ -29,9 +33,13 @@ export class AppRepo {
     channels: observable(new Map<string, ChannelStore>()),
   };
 
-  private readonly userPool = new Map<string, Model.User>();
+  get userPool(): UserPool {
+    return this._userPool;
+  }
 
-  private readonly channelRepos = new Map<string, ChannelRepo>();
+  private readonly _userPool = new Map<string, Model.User>();
+
+  private readonly _channelRepos = new Map<string, ChannelRepo>();
 
   /**
    * pipe: flow of WS messages  [repo -> pipe.sink -> pipe.conn -> pipe.source -> repo]
@@ -49,11 +57,11 @@ export class AppRepo {
     });
     source.on("broadcast", (m: ServerBroadcast) => {
       for (const u of m.newUsers) {
-        this.userPool.set(u.uuid, u);
+        this._userPool.set(u.uuid, u);
       }
       for (const c of m.channels) {
-        if (this.channelRepos.has(c.channelName)) {
-          const channelRepo = this.channelRepos.get(c.channelName)!;
+        if (this._channelRepos.has(c.channelName)) {
+          const channelRepo = this._channelRepos.get(c.channelName)!;
           channelRepo.onChannelBroadcast(c);
         }
       }
@@ -84,12 +92,12 @@ export class AppRepo {
     Debug.assert(
       this.appState.connStatus === WsState.connected && this.appState.identity,
       "getChannelRepo() required auth");
-    if (!this.channelRepos.has(channelName)) {
+    if (!this._channelRepos.has(channelName)) {
       const { conn, source, sink } = this.pipe;
-      const newRepo = new ChannelRepo(channelName, this.appState.identity!, this.userPool, conn, source, sink);
-      this.channelRepos.set(channelName, newRepo);
+      const newRepo = new ChannelRepo(channelName, this.appState.identity!, this._userPool, conn, source, sink);
+      this._channelRepos.set(channelName, newRepo);
       this.appState.channels.set(channelName, newRepo);
     }
-    return this.channelRepos.get(channelName)!;
+    return this._channelRepos.get(channelName)!;
   }
 }

@@ -36,7 +36,7 @@ export const theme = createMuiTheme(
     },
   });
 
-export function injectMuiTheme<P>(uiRoot: React.Factory<P>): React.Factory<P> {
+export function injectMuiTheme<P>(orig: React.FunctionComponent<P> | React.ComponentClass<P>): typeof orig {
 
   const styles = (theme: Theme) =>
     createStyles(
@@ -47,7 +47,7 @@ export function injectMuiTheme<P>(uiRoot: React.Factory<P>): React.Factory<P> {
         },
       });
 
-  const StyledContent = withStyles(styles)(uiRoot as any);
+  const StyledContent = withStyles(styles)(orig as any);
   return (props: undefined | (React.Attributes & P), ...children: React.ReactNode[]) => (
     <MuiThemeProvider theme={theme}>
       <CssBaseline/>

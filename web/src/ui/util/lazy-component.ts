@@ -3,16 +3,19 @@ import { isEqual, isEqualWith } from 'lodash-es';
 
 /**
  * PureComponent that re-renders when
- * @param p
+ * @param c
+ * @param comparator
  */
-export function lazyComponent<P>(p: React.ComponentClass<P> | React.FunctionComponent<P>): React.ComponentClass<P> {
+export function lazyComponent<P>(
+  c: React.ComponentClass<P> | React.FunctionComponent<P>,
+  comparator: (currentProps: P, nextProps: P) => boolean = isEqual): React.ComponentClass<P> {
 
   class ComponentWithDeep extends React.Component<P> {
     shouldComponentUpdate(nextProps: Readonly<P>, nextState: Readonly<{}>, nextContext: any): boolean {
-      return !isEqual(this.props, nextProps);
+      return !comparator(this.props, nextProps);
     }
     render(): React.ReactNode {
-      return React.createElement(p, this.props);
+      return React.createElement(c, this.props);
     }
   }
 

@@ -12,13 +12,13 @@ interface ChannelListProps {
   channels: ChannelView[];
   currentChannel?: string;
 
-  onChannelSelect?(channel: string): void;
+  onSwitchChannel?(channel: string): void;
 
-  onJoinChannel?(channel: string): void;
+  onAddChannel?(channel: string): void;
 }
 
 interface ChannelListState {
-
+  newChannel: string;
 }
 
 const JoinedChannel = lazyComponent((props: ChannelView & { selected: boolean }) => (
@@ -30,7 +30,11 @@ const JoinedChannel = lazyComponent((props: ChannelView & { selected: boolean })
   </ListItem>
 ));
 
-export class ChannelList extends React.Component<ChannelListProps> {
+export class ChannelList extends React.Component<ChannelListProps, ChannelListState> {
+
+  state: ChannelListState = {
+    newChannel: '',
+  }
 
   renderJoinedChannels() {
     const { channels, currentChannel } = this.props;

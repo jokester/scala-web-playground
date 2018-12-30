@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
-import { DemoApp } from './demo-app';
 import { App } from './app';
 import * as serviceWorker from './serviceWorker';
 import { getLogger, isProdBuild } from "./util";
@@ -25,8 +24,7 @@ const appRepo = createRepo();
 
 function render() {
   ReactDOM.render(
-    <DemoApp/>,
-    // <App appRepo={appRepo}/>,
+    <App appRepo={appRepo}/>,
     document.getElementById('root') as HTMLElement
   );
   logger.debug("rendered");

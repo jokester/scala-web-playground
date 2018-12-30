@@ -1,22 +1,9 @@
 import * as React from 'react';
-import {
-  AppBar,
-  Avatar,
-  Button,
-  CircularProgress,
-  Grid,
-  Icon,
-  List,
-  ListItem,
-  ListItemText,
-  Paper,
-  Toolbar,
-  Typography,
-  withWidth
-} from "@material-ui/core";
+import { Avatar, Button, Grid, Icon, List, ListItem, ListItemText, Paper, Typography, withWidth } from "@material-ui/core";
 
 import { Group as GroupIcon, GroupAdd as GroupAddIcon } from '@material-ui/icons';
 import { injectMuiTheme } from "../theme";
+import { AppTitle } from "../parts/app-title";
 
 const MyWidth = withWidth()((props: { width: string }) => {
   return <span>Current width: {props.width}</span>;
@@ -28,7 +15,7 @@ function DemoLayoutContent(props: {}) {
   const open = false;
   return (
     <div className="" style={{ height: 'calc(100vh)', display: 'flex', }}>
-      <TitleBar/>
+      <AppTitle connecting={true}/>
       <Grid container className="grow-1" style={{ marginTop: 48, padding: 8, }}>
         <Grid item xs={12} container>
           <SideBar/>
@@ -36,22 +23,6 @@ function DemoLayoutContent(props: {}) {
         </Grid>
       </Grid>
     </div>
-  );
-}
-
-function TitleBar() {
-  return (
-    <AppBar>
-      <Toolbar>
-        <Typography variant="h6" color="inherit">
-          Talkative
-        </Typography>
-        <CircularProgress color="secondary"/>
-        <Typography>
-          <MyWidth/>
-        </Typography>
-      </Toolbar>
-    </AppBar>
   );
 }
 

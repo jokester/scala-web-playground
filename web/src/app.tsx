@@ -5,38 +5,40 @@ import { ChannelList } from "./ui/parts";
 import { AppTitle } from "./ui/parts/app-title";
 import { Grid } from "@material-ui/core";
 import { ChannelDetail } from "./ui/parts/channel-detail";
+import { computed } from "mobx";
 
 interface UiProps {
   appRepo: AppRepo;
 }
 
 interface UIState {
-  channels: string[];
   // none for
   currentChannel?: string;
 }
 
 class AppLayout extends React.Component<UiProps, UIState> {
 
-  state: UIState = {
-    channels: [],
-  };
+  state: UIState = {};
 
   get appRepo() {
     return this.props.appRepo;
   }
 
-  onAddChannel = (channel: string) => {
-    const { channels } = this.state;
+  @computed
+  get channels() {
+    return Array.from(this.appRepo.appState.channels.keys());
+  }
 
+  onAddChannel = (channel: string) => {
     const trimmedChannel = channel.trim();
     if (!trimmedChannel) return;
+
+    const { channels } = this;
 
     if (channels.indexOf(trimmedChannel) !== -1) {
       this.appRepo.getChannelRepo(trimmedChannel).join();
       this.setState(
         {
-          channels: channels.concat([trimmedChannel]),
           currentChannel: trimmedChannel,
         });
     } else {
@@ -49,16 +51,12 @@ class AppLayout extends React.Component<UiProps, UIState> {
   };
 
   renderChannelList() {
-    const { appRepo } = this.props;
-    const { channels, currentChannel } = this.state;
-    const views = channels.map(c => ({
-      name: c,
-      userCount: 50,
-    }));
+    const { appRepo, channels } = this;
+    const { currentChannel } = this.state;
 
     return (
       <ChannelList
-        channels={views}
+        appRepo={appRepo}
         currentChannel={currentChannel}
         onAddChannel={this.onAddChannel}
         onSwitchChannel={this.onSwitchChannel}

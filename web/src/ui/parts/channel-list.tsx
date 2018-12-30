@@ -2,6 +2,8 @@ import * as React from "react";
 import { Avatar, Grid, List, ListItem, ListItemText } from "@material-ui/core";
 import { Group as GroupIcon, GroupAdd as GroupAddIcon } from "@material-ui/icons";
 import { lazyComponent } from "../util/lazy-component";
+import { AppRepo } from "../../repo";
+import { observer } from "mobx-react";
 
 interface ChannelView {
   name: string;
@@ -9,7 +11,7 @@ interface ChannelView {
 }
 
 interface ChannelListProps {
-  channels: ChannelView[];
+  appRepo: AppRepo;
   currentChannel?: string;
 
   onSwitchChannel?(channel: string): void;
@@ -30,16 +32,19 @@ const JoinedChannel = lazyComponent((props: ChannelView & { selected: boolean })
   </ListItem>
 ));
 
+@observer
 export class ChannelList extends React.Component<ChannelListProps, ChannelListState> {
 
   state: ChannelListState = {
     newChannel: '',
-  }
+  };
 
   renderJoinedChannels() {
-    const { channels, currentChannel } = this.props;
+    const { appRepo, currentChannel } = this.props;
+    const channels = Array.from(appRepo.appState.channels.keys());
+
     return channels.map(
-      c => <JoinedChannel key={c.name} selected={c.name === currentChannel} {...c}/>);
+      c => <JoinedChannel key={c} selected={c === currentChannel} name={c} userCount={20}/>);
   }
 
   render() {

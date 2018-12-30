@@ -18,7 +18,7 @@ interface UIState {
   currentChannel?: string;
 }
 
-const logger = getLogger('app.tsx');
+const logger = getLogger('app.tsx', 'debug');
 
 class AppLayout extends React.Component<UiProps, UIState> {
 

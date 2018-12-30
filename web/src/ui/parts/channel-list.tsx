@@ -23,8 +23,8 @@ interface ChannelListState {
   newChannel: string;
 }
 
-const JoinedChannel = lazyComponent((props: ChannelView & { selected: boolean }) => (
-  <ListItem button selected={props.selected}>
+const JoinedChannel = lazyComponent((props: ChannelView & { selected: boolean; onClick?(c: string): void; }) => (
+  <ListItem button selected={props.selected} onClick={props.onClick ? () => props.onClick!(props.name) : undefined}>
     <Avatar>
       <GroupIcon/>
     </Avatar>
@@ -44,7 +44,7 @@ export class ChannelList extends React.Component<ChannelListProps, ChannelListSt
     const channels = Array.from(appRepo.appState.channels.keys());
 
     return channels.map(
-      c => <JoinedChannel key={c} selected={c === currentChannel} name={c} userCount={20}/>);
+      c => <JoinedChannel key={c} selected={c === currentChannel} name={c} userCount={20} onClick={this.props.onSwitchChannel}/>);
   }
 
   render() {

@@ -50,12 +50,12 @@ class AppLayout extends React.Component<UiProps, UIState> {
     } else {
       this.onSwitchChannel(trimmedChannel);
     }
-  };
+  }
 
   onSwitchChannel = (currentChannel: string) => {
     logger.debug('onSwitchChannel', currentChannel);
     this.setState({ currentChannel });
-  };
+  }
 
   renderChannelList() {
     const { appRepo, channels } = this;

@@ -7,8 +7,9 @@ const isProd = typeof process === 'object' && process.env.NODE_ENV === 'producti
 
 export function getLogger(name: string, level: LogLevelDesc = "WARN"): OurLogger {
   if (isProd) return dummyLogger;
-  if (!(name && name.trim()) || name.startsWith('/index'))
+  if (!(name && name.trim()) || name.startsWith('/index')) {
     throw new Error('logger must have a nonempty name. do not use __filename');
+  }
   const logger = getLogLevelLogger(name);
   logger.setLevel(level, false);
   return logger;

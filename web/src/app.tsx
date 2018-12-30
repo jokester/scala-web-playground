@@ -1,5 +1,5 @@
 import * as React from "react";
-import { AppRepo } from "./repo";
+import { AppRepo, WsState } from "./repo";
 import { injectMuiTheme } from "./ui/theme";
 import { ChannelList } from "./ui/parts";
 import { AppTitle } from "./ui/parts/app-title";
@@ -71,15 +71,16 @@ class AppLayout extends React.Component<UiProps, UIState> {
     if (this.state.currentChannel) {
       const cRepo = this.appRepo.getChannelRepo(this.state.currentChannel);
       const userPool = this.appRepo.userPool;
-      return <ChannelDetail channelRepo={cRepo} userPool={userPool} />
+      return <ChannelDetail channelRepo={cRepo} userPool={userPool}/>;
     }
     return null;
   }
 
   render() {
+    const connecting = this.appRepo.appState.connStatus !== WsState.connected;
     return (
       <div className="" style={{ height: 'calc(100vh)', display: 'flex', }}>
-        <AppTitle connecting={true}/>
+        <AppTitle connecting={connecting}/>
         <Grid container className="grow-1" style={{ marginTop: 48, padding: 8, }}>
           <Grid item xs={12} container>
             {this.renderChannelList()}

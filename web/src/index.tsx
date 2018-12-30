@@ -5,6 +5,7 @@ import { App } from './app';
 import * as serviceWorker from './serviceWorker';
 import { getLogger, isProdBuild } from "./util";
 import { createRepo } from "./repo/app-repo";
+import { tryRepo } from "./repo/dummy";
 
 const logger = getLogger(__filename, "debug");
 
@@ -38,6 +39,7 @@ if (isProdBuild) {
   serviceWorker.unregister();
 } else {
   registerHMR();
+  tryRepo(appRepo);
 }
 
 render();

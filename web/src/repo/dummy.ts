@@ -3,8 +3,7 @@ import { AppRepo, createRepo } from "./app-repo";
 import { wait } from "../commonutil/async";
 import { createEventPipe } from "../realworld";
 
-export async function tryRepo() {
-  const appRepo = createRepo();
+export async function tryRepo(appRepo: AppRepo) {
   await appRepo.startConnect();
 
   await appRepo.auth("tryRepo", "otp");
@@ -13,15 +12,10 @@ export async function tryRepo() {
 
   await channelRepo.join();
 
-  await channelRepo.sendMessage("chan1-msg1");
-
-  await wait(3e3);
-
-  await channelRepo.sendMessage("chan1-msg2");
-
-  await wait(3e3);
-
-  await channelRepo.leave();
+  for (let i = 0; i < 1e4; ++i) {
+    await channelRepo.sendMessage(`chan1-msg${i}`);
+    await wait(3e3);
+  }
 }
 
 export async function tryConnection() {

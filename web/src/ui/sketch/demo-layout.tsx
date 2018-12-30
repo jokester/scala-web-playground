@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { Avatar, Button, Grid, Icon, List, ListItem, ListItemText, Paper, Typography, withWidth } from "@material-ui/core";
-
-import { Group as GroupIcon, GroupAdd as GroupAddIcon } from '@material-ui/icons';
+import { Button, Grid, Icon, Paper, Typography, withWidth } from "@material-ui/core";
 import { injectMuiTheme } from "../theme";
 import { AppTitle } from "../parts/app-title";
+import { ChannelList } from "../parts";
 
 const MyWidth = withWidth()((props: { width: string }) => {
   return <span>Current width: {props.width}</span>;
@@ -18,7 +17,7 @@ function DemoLayoutContent(props: {}) {
       <AppTitle connecting={true}/>
       <Grid container className="grow-1" style={{ marginTop: 48, padding: 8, }}>
         <Grid item xs={12} container>
-          <SideBar/>
+          <ChannelList channels={[]}/>
           <JoinedRoom/>
         </Grid>
       </Grid>
@@ -58,29 +57,3 @@ function UnjoinedRoom() {
   );
 }
 
-function SideBar() {
-  return (
-    <Grid item xs={3}>
-      <List>
-        <ListItem button selected>
-          <Avatar>
-            <GroupIcon/>
-          </Avatar>
-          <ListItemText primary="Group 1" secondary="1 person"/>
-        </ListItem>
-        <ListItem button divider>
-          <Avatar>
-            <GroupIcon/>
-          </Avatar>
-          <ListItemText primary="Group 2" secondary="1 person"/>
-        </ListItem>
-        <ListItem button divider>
-          <Avatar>
-            <GroupAddIcon/>
-          </Avatar>
-          <ListItemText primary="Join"/>
-        </ListItem>
-      </List>
-    </Grid>
-  );
-}

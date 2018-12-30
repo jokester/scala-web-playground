@@ -25,7 +25,7 @@ export class ChannelDetail extends React.Component<ChannelDetailProps> {
     const messages = Array.from(channelRepo.messages.values());
 
     return (
-      <Grid container item xs direction="column" style={{ marginTop: 8 }}>
+      <Grid container item xs direction="column" style={{ marginTop: 8, flexWrap: 'nowrap' }}>
         <div className="grow-1 chat-history">
           <MessageList messages={messages} userPool={userPool}/>
         </div>
@@ -40,14 +40,14 @@ class MessageDraft extends React.Component<{ submitDisabled?: boolean, onSubmit?
     draft: '',
   };
 
-  onSubmit() {
+  onSubmit = () => {
     if (this.props.onSubmit) {
       this.props.onSubmit(this.state.draft);
       this.setState({ draft: '' });
     }
   }
 
-  onChange(ev: ChangeEvent<HTMLTextAreaElement>) {
+  onChange = (ev: ChangeEvent<HTMLTextAreaElement>) => {
     this.setState({ draft: ev.target.value });
   }
 
@@ -55,7 +55,7 @@ class MessageDraft extends React.Component<{ submitDisabled?: boolean, onSubmit?
     const { draft } = this.state;
     const submitDisabled = this.props.submitDisabled || !draft.trim();
     return (
-      <div style={{ display: 'flex', }}>
+      <div style={{ display: 'flex', flexShrink: 0 }}>
         <textarea className="grow-1"
                   style={{ height: 64, resize: 'none', }}
                   onChange={this.onChange}

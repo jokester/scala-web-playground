@@ -4,6 +4,7 @@ import { wait } from "../commonutil/async";
 import { createEventPipe } from "../realworld";
 
 export async function tryRepo(appRepo: AppRepo) {
+  await wait(1e3);
   await appRepo.startConnect();
 
   await appRepo.auth("tryRepo", "otp");

@@ -8,6 +8,7 @@ import { ChannelDetail } from "./ui/parts/channel-detail";
 import { computed } from "mobx";
 import { Debug } from "./util/debug";
 import { getLogger } from "./util";
+import { observer } from "mobx-react";
 
 interface UiProps {
   appRepo: AppRepo;
@@ -20,6 +21,7 @@ interface UIState {
 
 const logger = getLogger('app.tsx', 'debug');
 
+@observer
 class AppLayout extends React.Component<UiProps, UIState> {
 
   state: UIState = {};

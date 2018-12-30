@@ -7,7 +7,7 @@ import { getLogger, isProdBuild } from "./util";
 import { createRepo } from "./repo/app-repo";
 import { tryRepo } from "./repo/dummy";
 
-const logger = getLogger(__filename, "debug");
+const logger = getLogger('src/index.tsx', "debug");
 
 function registerHMR() {
   type ModuleHMR = typeof module & {

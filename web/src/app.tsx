@@ -6,6 +6,8 @@ import { AppTitle } from "./ui/parts/app-title";
 import { Grid } from "@material-ui/core";
 import { ChannelDetail } from "./ui/parts/channel-detail";
 import { computed } from "mobx";
+import { Debug } from "./util/debug";
+import { getLogger } from "./util";
 
 interface UiProps {
   appRepo: AppRepo;
@@ -15,6 +17,8 @@ interface UIState {
   // none for
   currentChannel?: string;
 }
+
+const logger = getLogger('app.tsx');
 
 class AppLayout extends React.Component<UiProps, UIState> {
 
@@ -30,6 +34,8 @@ class AppLayout extends React.Component<UiProps, UIState> {
   }
 
   onAddChannel = (channel: string) => {
+    logger.debug('onAddChannel', channel);
+
     const trimmedChannel = channel.trim();
     if (!trimmedChannel) return;
 
@@ -47,6 +53,7 @@ class AppLayout extends React.Component<UiProps, UIState> {
   };
 
   onSwitchChannel = (currentChannel: string) => {
+    logger.debug('onSwitchChannel', currentChannel);
     this.setState({ currentChannel });
   };
 

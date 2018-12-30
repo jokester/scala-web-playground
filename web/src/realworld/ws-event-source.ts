@@ -11,7 +11,7 @@ import {
 import { TypedEventEmitter } from "../util/typed-event-emitter";
 import { getLogger } from "../util";
 
-const logger = getLogger(__filename);
+const logger = getLogger('ws-event-src');
 
 export interface DecodeEventMap {
   pong: ServerPong;

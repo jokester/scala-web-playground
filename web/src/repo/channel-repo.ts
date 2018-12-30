@@ -1,14 +1,12 @@
 import { action, observable, runInAction } from "mobx";
 import { Model } from "../model";
 import { getLogger } from "../util";
-import { WsEventSource } from "../realworld/ws-event-source";
-import { WsEventSink } from "../realworld/ws-event-sink";
-import { WsConnection } from "../realworld/ws-connection";
+import { WsEventSource, WsEventSink, WsConnection } from "../realworld";
 import { ChatroomChatMessage, ServerChannelBroadcast, ServerJoinedChannel } from "../../src-gen";
 import { Debug } from "../util/debug";
 import { nonce8 } from "../util/string-util";
 
-const logger = getLogger(__filename);
+const logger = getLogger('chan-repo');
 
 export interface ChannelStore {
   state: ChannelState;

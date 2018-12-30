@@ -22,7 +22,7 @@ export interface AppStore {
 // read-only obj pools for UI
 export type UserPool = ReadonlyMap<string, DeepReadonly<Model.User>>;
 
-const logger = getLogger(__filename);
+const logger = getLogger('app-repo.ts');
 
 export class AppRepo {
 

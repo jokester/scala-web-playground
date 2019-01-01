@@ -1,11 +1,13 @@
 import * as React from "react";
+import { ChangeEvent } from "react";
+import { last } from 'lodash-es';
+
 import { Button, Grid, Icon, Paper, Typography } from "@material-ui/core";
 import { ChannelRepo, ChannelState } from "../../repo/channel-repo";
 import { lazyComponent } from "../util/lazy-component";
 import { observer } from "mobx-react";
 import { Model } from "../../model";
 import { UserPool } from "../../repo/app-repo";
-import { ChangeEvent } from "react";
 import { getLogger } from "../../util";
 
 interface ChannelDetailProps {
@@ -88,7 +90,15 @@ const MessageList = lazyComponent(
       </>
     );
   },
-  (p1, p2) => p1.messages.length === p2.messages.length);
+  (p1, p2) => {
+    if (p1.messages.length !== p2.messages.length) return false;
+    if (p1.messages.length) {
+      const m1 = last(p1.messages)!;
+      const m2 = last(p2.messages)!;
+      if (m1.uuid !== m2.uuid) return false;
+    }
+    return true;
+  });
 
 const MessageListItem = lazyComponent(
   (props: { msg: Model.ChatMessage, userPool: UserPool }) => {

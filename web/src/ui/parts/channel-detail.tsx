@@ -6,11 +6,14 @@ import { observer } from "mobx-react";
 import { Model } from "../../model";
 import { UserPool } from "../../repo/app-repo";
 import { ChangeEvent } from "react";
+import { getLogger } from "../../util";
 
 interface ChannelDetailProps {
   channelRepo: ChannelRepo;
   userPool: UserPool;
 }
+
+const logger = getLogger('channel-detail');
 
 @observer
 export class ChannelDetail extends React.Component<ChannelDetailProps> {
@@ -45,11 +48,11 @@ class MessageDraft extends React.Component<{ submitDisabled?: boolean, onSubmit?
       this.props.onSubmit(this.state.draft);
       this.setState({ draft: '' });
     }
-  }
+  };
 
   onChange = (ev: ChangeEvent<HTMLTextAreaElement>) => {
     this.setState({ draft: ev.target.value });
-  }
+  };
 
   render() {
     const { draft } = this.state;
@@ -89,15 +92,19 @@ const MessageList = lazyComponent(
 
 const MessageListItem = lazyComponent(
   (props: { msg: Model.ChatMessage, userPool: UserPool }) => {
-    const u = props.userPool.get(props.msg.userUuid);
-
+    const { msg, userPool } = props;
+    const u = userPool.get(msg.userUuid);
     if (!u) {
       throw new Error('user not in userPool');
     }
+    const date = msg.timestamp ? new Date(msg.timestamp!).toString() : 'sending ...';
     return (
-      <Paper elevation={1} style={{ padding: 8 }}>
+      <Paper elevation={1} className="message-list-item">
+        <Typography variant="subtitle2">
+          {`${date} / ${u.name}:`}
+        </Typography>
         <Typography>
-          {props.msg.text}
+          {msg.text}
         </Typography>
       </Paper>
     );

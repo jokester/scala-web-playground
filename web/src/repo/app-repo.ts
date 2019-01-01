@@ -63,6 +63,8 @@ export class AppRepo {
         if (this._channelRepos.has(c.channelName)) {
           const channelRepo = this._channelRepos.get(c.channelName)!;
           channelRepo.onChannelBroadcast(c);
+        } else {
+          logger.warn("got broadcast from not joined channel", c);
         }
       }
     });

@@ -5,7 +5,6 @@ import { WsEventSource, WsEventSink, WsConnection } from "../realworld";
 import { ChatroomChatMessage, ServerChannelBroadcast, ServerJoinedChannel } from "../../src-gen";
 import { Debug } from "../util/debug";
 import { nonce8 } from "../util/string-util";
-import { TypedEventEmitter } from "../util/typed-event-emitter";
 
 const logger = getLogger('chan-repo');
 
@@ -22,14 +21,10 @@ export enum ChannelState {
   left = "ChannelState.left",
 }
 
-interface ChannelRepoEventMap {
-  userRequestLeave: /* channelName */ string;
-}
-
 /**
  * mobx-observable repo
  */
-export class ChannelRepo extends TypedEventEmitter<ChannelRepoEventMap> implements ChannelStore {
+export class ChannelRepo implements ChannelStore {
 
   @observable
   state = ChannelState.left;
@@ -51,7 +46,6 @@ export class ChannelRepo extends TypedEventEmitter<ChannelRepoEventMap> implemen
               private readonly conn: WsConnection,
               private readonly eventSrc: WsEventSource,
               private readonly eventSink: WsEventSink) {
-    super();
   }
 
   @action
@@ -68,7 +62,10 @@ export class ChannelRepo extends TypedEventEmitter<ChannelRepoEventMap> implemen
 
   @action
   async sendMessage(text: string) {
-    this.assertState(ChannelState.joined);
+    if (this.state !== ChannelState.joined) {
+      logger.warn("trying to send text when not joined");
+      return;
+    }
 
     const tmpMessage: Model.ChatMessage = {
       text,
@@ -118,16 +115,15 @@ export class ChannelRepo extends TypedEventEmitter<ChannelRepoEventMap> implemen
 
   @action
   async leave() {
+    if (this.state === ChannelState.left) {
+      return;
+    }
     this.assertState(ChannelState.joined);
-    this.emit("userRequestLeave", this.channelName);
+    this.state = ChannelState.left;
     try {
       const { reason } = await this.eventSink.leaveChannel(this.uuid!);
       logger.debug(`left channel=${this.channelName}: ${reason}`);
     } finally {
-      runInAction(() => {
-        this.uuid = undefined;
-        this.state = ChannelState.left;
-      });
     }
   }
 

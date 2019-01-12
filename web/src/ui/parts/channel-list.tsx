@@ -1,32 +1,52 @@
 import * as React from "react";
-import { Avatar, Grid, List, ListItem, ListItemText, Input , Button} from "@material-ui/core/es";
+import { Avatar, Button, Grid, Input, List, ListItem, ListItemText } from "@material-ui/core/es";
 import { Group as GroupIcon, GroupAdd as GroupAddIcon } from "@material-ui/icons";
 import { lazyComponent } from "../util/lazy-component";
 import { AppRepo } from "../../repo";
 import { observer } from "mobx-react";
+import { ChannelState } from "../../repo/channel-repo";
 
 interface ChannelView {
   name: string;
   userCount: number;
+  selected: boolean;
+  state: ChannelState;
 }
 
 interface ChannelListProps {
   appRepo: AppRepo;
+  channels: string[];
   currentChannel?: string;
 
-  onSwitchChannel(channel: string): void;
+  onSwitchChannel(channelName: string): void;
 
-  onJoinChannel(channel: string): void;
+  onLeaveChannel(channelName: string): void;
+
+  onJoinChannel(channelName: string): void;
 }
 
-const JoinedChannel = lazyComponent((props: ChannelView & { selected: boolean; onClick?(c: string): void; }) => (
-  <ListItem button selected={props.selected} onClick={props.onClick ? () => props.onClick!(props.name) : undefined}>
-    <Avatar>
-      <GroupIcon/>
-    </Avatar>
-    <ListItemText primary={props.name} secondary={props.userCount > 1 ? `${props.userCount} users online` : `${props.userCount} user online`}/>
-  </ListItem>
-));
+class JoinedChannel extends React.Component<ChannelView & Pick<ChannelListProps, "onSwitchChannel" | "onLeaveChannel">> {
+
+  onLeaveChannel = (ev: React.MouseEvent<unknown>) => {
+    ev.stopPropagation();
+    this.props.onLeaveChannel(this.props.name);
+  };
+
+  render() {
+    const { props } = this;
+    return (
+      <ListItem button selected={props.selected} onClick={() => props.onSwitchChannel(props.name)}>
+        <Avatar>
+          <GroupIcon/>
+        </Avatar>
+        <ListItemText>
+          <div> {`${props.name} / ${props.userCount} user (s)`} </div>
+          <Button variant="contained" color="primary" disabled={props.state !== ChannelState.joined} onClick={this.onLeaveChannel}>Leave</Button>
+        </ListItemText>
+      </ListItem>
+    );
+  }
+}
 
 class NewChannel extends React.Component<Pick<ChannelListProps, "onJoinChannel">, { channelName: string }> {
   state = {
@@ -52,7 +72,7 @@ class NewChannel extends React.Component<Pick<ChannelListProps, "onJoinChannel">
         </Avatar>
         <ListItemText>
           <Input placeholder="Channel name" onChange={this.onChange} value={this.state.channelName}/>
-          {" "}
+          <br/>
           <Button variant="contained" color="primary" disabled={!this.state.channelName} onClick={this.onSubmit}>Join</Button>
         </ListItemText>
       </ListItem>
@@ -64,16 +84,18 @@ class NewChannel extends React.Component<Pick<ChannelListProps, "onJoinChannel">
 export class ChannelList extends React.Component<ChannelListProps, never> {
 
   renderJoinedChannels() {
-    const { appRepo, currentChannel } = this.props;
-    const channels = Array.from(appRepo.appState.channels.keys());
-
-    return channels.map(
-      c => <JoinedChannel
+    const { appRepo, currentChannel, channels } = this.props;
+    return channels.map(c => (
+      <JoinedChannel
         key={c}
         selected={c === currentChannel}
         name={c}
+        state={appRepo.getChannelRepo(c)!.state}
         userCount={appRepo.appState.channels.get(c)!.userUuids.length}
-        onClick={this.props.onSwitchChannel}/>);
+        onSwitchChannel={this.props.onSwitchChannel}
+        onLeaveChannel={this.props.onLeaveChannel}
+      />
+    ));
   }
 
   render() {

@@ -28,8 +28,12 @@ export class ChannelDetail extends React.Component<ChannelDetailProps> {
   render() {
     const { channelRepo, userPool } = this.props;
 
+    if (!channelRepo) {
+      return "leaving ...";
+    }
+
     if (channelRepo.state !== ChannelState.joined) {
-      return "joining ... ";
+      return "joining ...";
     }
 
     const messages = Array.from(channelRepo.messages.values());

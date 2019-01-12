@@ -122,7 +122,7 @@ const MessageListItem = lazyComponent(
         <Typography variant="subtitle2">
           {`${date} / ${u.name}:`}
         </Typography>
-        <Typography>
+        <Typography component="pre">
           {msg.text}
         </Typography>
       </Paper>

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Avatar, Grid, List, ListItem, ListItemText, Input , Button} from "@material-ui/core/es";
+import { Avatar, Grid, List, ListItem, ListItemText, Input, Button } from "@material-ui/core/es";
 import { Group as GroupIcon, GroupAdd as GroupAddIcon } from "@material-ui/icons";
 import { lazyComponent } from "../util/lazy-component";
 import { AppRepo } from "../../repo";
@@ -8,23 +8,28 @@ import { observer } from "mobx-react";
 interface ChannelView {
   name: string;
   userCount: number;
+  selected: boolean;
 }
 
 interface ChannelListProps {
   appRepo: AppRepo;
   currentChannel?: string;
 
-  onSwitchChannel(channel: string): void;
+  onSwitchChannel(channelName: string): void;
 
-  onJoinChannel(channel: string): void;
+  onLeaveChannel(channelName: string): void;
+
+  onJoinChannel(channelName: string): void;
 }
 
-const JoinedChannel = lazyComponent((props: ChannelView & { selected: boolean; onClick?(c: string): void; }) => (
-  <ListItem button selected={props.selected} onClick={props.onClick ? () => props.onClick!(props.name) : undefined}>
+const JoinedChannel = lazyComponent((props: ChannelView & Pick<ChannelListProps, "onSwitchChannel" | "onLeaveChannel">) => (
+  <ListItem button selected={props.selected} onClick={() => props.onSwitchChannel(props.name)}>
     <Avatar>
       <GroupIcon/>
     </Avatar>
-    <ListItemText primary={props.name} secondary={props.userCount > 1 ? `${props.userCount} users online` : `${props.userCount} user online`}/>
+    <ListItemText secondary={props.userCount > 1 ? `${props.userCount} users online` : `${props.userCount} user online`}>
+      {props.name}
+    </ListItemText>
   </ListItem>
 ));
 
@@ -67,13 +72,16 @@ export class ChannelList extends React.Component<ChannelListProps, never> {
     const { appRepo, currentChannel } = this.props;
     const channels = Array.from(appRepo.appState.channels.keys());
 
-    return channels.map(
-      c => <JoinedChannel
+    return channels.map(c => (
+      <JoinedChannel
         key={c}
         selected={c === currentChannel}
         name={c}
         userCount={appRepo.appState.channels.get(c)!.userUuids.length}
-        onClick={this.props.onSwitchChannel}/>);
+        onSwitchChannel={this.props.onSwitchChannel}
+        onLeaveChannel={this.props.onLeaveChannel}
+      />
+    ));
   }
 
   render() {

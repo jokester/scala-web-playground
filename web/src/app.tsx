@@ -51,6 +51,15 @@ class AppLayout extends React.Component<UiProps, UIState> {
     }
   };
 
+  onLeaveChannel = (channelName: string) => {
+    logger.debug('onLeaveChannel', channelName);
+
+    const { channels } = this;
+    if (channels.indexOf(channelName)) {
+      this.appRepo.leaveChannel(channelName);
+    }
+  }
+
   onSwitchChannel = (currentChannel: string) => {
     logger.debug('onSwitchChannel', currentChannel);
     this.setState({ currentChannel });
@@ -66,6 +75,7 @@ class AppLayout extends React.Component<UiProps, UIState> {
         currentChannel={currentChannel}
         onJoinChannel={this.onJoinChannel}
         onSwitchChannel={this.onSwitchChannel}
+        onLeaveChannel={this.onLeaveChannel}
       />
     );
 

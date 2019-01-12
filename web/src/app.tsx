@@ -35,29 +35,26 @@ class AppLayout extends React.Component<UiProps, UIState> {
     return Array.from(this.appRepo.appState.channels.keys());
   }
 
-  onAddChannel = (channel: string) => {
-    logger.debug('onAddChannel', channel);
-
-    const trimmedChannel = channel.trim();
-    if (!trimmedChannel) return;
+  onJoinChannel = (channelName: string) => {
+    logger.debug('onJoinChannel', channelName);
 
     const { channels } = this;
 
-    if (channels.indexOf(trimmedChannel) !== -1) {
-      this.appRepo.getChannelRepo(trimmedChannel).join();
+    if (channels.indexOf(channelName) < 0) {
+      this.appRepo.getChannelRepo(channelName).join();
       this.setState(
         {
-          currentChannel: trimmedChannel,
+          currentChannel: channelName,
         });
     } else {
-      this.onSwitchChannel(trimmedChannel);
+      this.onSwitchChannel(channelName);
     }
-  }
+  };
 
   onSwitchChannel = (currentChannel: string) => {
     logger.debug('onSwitchChannel', currentChannel);
     this.setState({ currentChannel });
-  }
+  };
 
   renderChannelList() {
     const { appRepo, channels } = this;
@@ -67,7 +64,7 @@ class AppLayout extends React.Component<UiProps, UIState> {
       <ChannelList
         appRepo={appRepo}
         currentChannel={currentChannel}
-        onAddChannel={this.onAddChannel}
+        onJoinChannel={this.onJoinChannel}
         onSwitchChannel={this.onSwitchChannel}
       />
     );

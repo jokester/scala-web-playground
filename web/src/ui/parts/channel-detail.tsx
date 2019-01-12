@@ -23,7 +23,7 @@ export class ChannelDetail extends React.Component<ChannelDetailProps> {
   onSubmit = (text: string) => {
     const { channelRepo, userPool } = this.props;
     channelRepo.sendMessage(text);
-  }
+  };
 
   render() {
     const { channelRepo, userPool } = this.props;

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Avatar, Grid, List, ListItem, ListItemText } from "@material-ui/core";
+import { Avatar, Grid, List, ListItem, ListItemText, Input , Button} from "@material-ui/core/es";
 import { Group as GroupIcon, GroupAdd as GroupAddIcon } from "@material-ui/icons";
 import { lazyComponent } from "../util/lazy-component";
 import { AppRepo } from "../../repo";
@@ -14,13 +14,9 @@ interface ChannelListProps {
   appRepo: AppRepo;
   currentChannel?: string;
 
-  onSwitchChannel?(channel: string): void;
+  onSwitchChannel(channel: string): void;
 
-  onAddChannel?(channel: string): void;
-}
-
-interface ChannelListState {
-  newChannel: string;
+  onJoinChannel(channel: string): void;
 }
 
 const JoinedChannel = lazyComponent((props: ChannelView & { selected: boolean; onClick?(c: string): void; }) => (
@@ -32,12 +28,40 @@ const JoinedChannel = lazyComponent((props: ChannelView & { selected: boolean; o
   </ListItem>
 ));
 
-@observer
-export class ChannelList extends React.Component<ChannelListProps, ChannelListState> {
-
-  state: ChannelListState = {
-    newChannel: '',
+class NewChannel extends React.Component<Pick<ChannelListProps, "onJoinChannel">, { channelName: string }> {
+  state = {
+    channelName: '',
   };
+
+  onChange = (ev: { target: { value: string } }) => {
+    this.setState({ channelName: (ev.target.value || '').trim() });
+  };
+
+  onSubmit = (ev: unknown) => {
+    if (this.state.channelName) {
+      this.props.onJoinChannel(this.state.channelName);
+      this.setState({ channelName: '' });
+    }
+  };
+
+  render() {
+    return (
+      <ListItem button divider>
+        <Avatar>
+          <GroupAddIcon/>
+        </Avatar>
+        <ListItemText>
+          <Input placeholder="Channel name" onChange={this.onChange} value={this.state.channelName}/>
+          {" "}
+          <Button variant="contained" color="primary" disabled={!this.state.channelName} onClick={this.onSubmit}>Join</Button>
+        </ListItemText>
+      </ListItem>
+    );
+  }
+}
+
+@observer
+export class ChannelList extends React.Component<ChannelListProps, never> {
 
   renderJoinedChannels() {
     const { appRepo, currentChannel } = this.props;
@@ -57,13 +81,7 @@ export class ChannelList extends React.Component<ChannelListProps, ChannelListSt
       <Grid item xs={3}>
         <List>
           {this.renderJoinedChannels()}
-
-          <ListItem button divider>
-            <Avatar>
-              <GroupAddIcon/>
-            </Avatar>
-            <ListItemText primary="Join"/>
-          </ListItem>
+          <NewChannel onJoinChannel={this.props.onJoinChannel}/>
         </List>
       </Grid>
     );

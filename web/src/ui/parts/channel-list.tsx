@@ -25,17 +25,28 @@ interface ChannelListProps {
   onJoinChannel(channelName: string): void;
 }
 
-const JoinedChannel = lazyComponent((props: ChannelView & Pick<ChannelListProps, "onSwitchChannel" | "onLeaveChannel">) => (
-  <ListItem button selected={props.selected} onClick={() => props.onSwitchChannel(props.name)}>
-    <Avatar>
-      <GroupIcon/>
-    </Avatar>
-    <ListItemText>
-      <div> {`${props.name} / ${props.userCount} user (s)`} </div>
-      <Button variant="contained" color="primary" disabled={props.state !== ChannelState.joined} onClick={() => props.onLeaveChannel(props.name)}>Leave</Button>
-    </ListItemText>
-  </ListItem>
-));
+class JoinedChannel extends React.Component<ChannelView & Pick<ChannelListProps, "onSwitchChannel" | "onLeaveChannel">> {
+
+  onLeaveChannel = (ev: React.MouseEvent<unknown>) => {
+    ev.stopPropagation();
+    this.props.onLeaveChannel(this.props.name);
+  };
+
+  render() {
+    const { props } = this;
+    return (
+      <ListItem button selected={props.selected} onClick={() => props.onSwitchChannel(props.name)}>
+        <Avatar>
+          <GroupIcon/>
+        </Avatar>
+        <ListItemText>
+          <div> {`${props.name} / ${props.userCount} user (s)`} </div>
+          <Button variant="contained" color="primary" disabled={props.state !== ChannelState.joined} onClick={this.onLeaveChannel}>Leave</Button>
+        </ListItemText>
+      </ListItem>
+    );
+  }
+}
 
 class NewChannel extends React.Component<Pick<ChannelListProps, "onJoinChannel">, { channelName: string }> {
   state = {

@@ -97,12 +97,15 @@ export class AppRepo {
       const newRepo = new ChannelRepo(channelName, this.appState.identity!, this._userPool, conn, source, sink);
       this._channelRepos.set(channelName, newRepo);
       this.appState.channels.set(channelName, newRepo);
+      newRepo.once('userRequestLeave', () => {
+        this.leaveChannel(channelName);
+      });
     }
     return this._channelRepos.get(channelName)!;
   }
 
   @action
-  leaveChannel(channelName: string) {
+  private leaveChannel(channelName: string) {
     this.assertAuthed();
     const c = this._channelRepos.get(channelName)!;
     if (c && c.state === ChannelState.joined) {

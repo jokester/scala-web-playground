@@ -28,7 +28,7 @@ const JoinedChannel = lazyComponent((props: ChannelView & { selected: boolean; o
     <Avatar>
       <GroupIcon/>
     </Avatar>
-    <ListItemText primary={props.name} secondary={`${props.userCount} users`}/>
+    <ListItemText primary={props.name} secondary={props.userCount > 1 ? `${props.userCount} users online` : `${props.userCount} user online`}/>
   </ListItem>
 ));
 
@@ -44,7 +44,12 @@ export class ChannelList extends React.Component<ChannelListProps, ChannelListSt
     const channels = Array.from(appRepo.appState.channels.keys());
 
     return channels.map(
-      c => <JoinedChannel key={c} selected={c === currentChannel} name={c} userCount={20} onClick={this.props.onSwitchChannel}/>);
+      c => <JoinedChannel
+        key={c}
+        selected={c === currentChannel}
+        name={c}
+        userCount={appRepo.appState.channels.get(c)!.userUuids.length}
+        onClick={this.props.onSwitchChannel}/>);
   }
 
   render() {

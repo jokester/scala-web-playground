@@ -90,14 +90,20 @@ export class AppRepo {
   }
 
   @action
-  getChannelRepo(channelName: string) {
+  createChannelRepo(channelName: string) {
     this.assertAuthed();
     if (!this._channelRepos.has(channelName)) {
       const { conn, source, sink } = this.pipe;
       const newRepo = new ChannelRepo(channelName, this.appState.identity!, this._userPool, conn, source, sink);
       this._channelRepos.set(channelName, newRepo);
       this.appState.channels.set(channelName, newRepo);
+      return newRepo;
     }
+    return this._channelRepos.get(channelName)!;
+  }
+
+  getChannelRepo(channelName: string) {
+    this.assertAuthed();
     return this._channelRepos.get(channelName)!;
   }
 

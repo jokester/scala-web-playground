@@ -6,7 +6,6 @@ import { AppTitle } from "./ui/parts/app-title";
 import { Grid } from "@material-ui/core";
 import { ChannelDetail } from "./ui/parts/channel-detail";
 import { computed } from "mobx";
-import { Debug } from "./util/debug";
 import { getLogger } from "./util";
 import { observer } from "mobx-react";
 
@@ -30,6 +29,7 @@ class AppLayout extends React.Component<UiProps, UIState> {
     return this.props.appRepo;
   }
 
+  @computed
   get channels() {
     return Array.from(this.appRepo.appState.channels.keys());
   }
@@ -40,7 +40,7 @@ class AppLayout extends React.Component<UiProps, UIState> {
     const { channels } = this;
 
     if (channels.indexOf(channelName) < 0) {
-      this.appRepo.getChannelRepo(channelName).join();
+      this.appRepo.createChannelRepo(channelName).join();
       this.setState(
         {
           currentChannel: channelName,
@@ -54,8 +54,10 @@ class AppLayout extends React.Component<UiProps, UIState> {
     logger.debug('onLeaveChannel', channelName);
 
     const { channels } = this;
-    if (channels.indexOf(channelName) >= 0) {
+    const prevIndex = channels.indexOf(channelName);
+    if (prevIndex >= 0) {
       this.appRepo.leaveChannel(channelName);
+      this.setState({ currentChannel: channels[prevIndex - 1] || channels[prevIndex + 1] });
     }
   };
 
@@ -72,6 +74,7 @@ class AppLayout extends React.Component<UiProps, UIState> {
       <ChannelList
         appRepo={appRepo}
         currentChannel={currentChannel}
+        channels={this.channels}
         onJoinChannel={this.onJoinChannel}
         onSwitchChannel={this.onSwitchChannel}
         onLeaveChannel={this.onLeaveChannel}

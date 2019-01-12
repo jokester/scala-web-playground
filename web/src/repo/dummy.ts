@@ -9,7 +9,7 @@ export async function tryRepo(appRepo: AppRepo) {
 
   await appRepo.auth("tryRepo", "otp");
 
-  const channelRepo = appRepo.getChannelRepo("chan1");
+  const channelRepo = appRepo.createChannelRepo("chan1");
 
   await channelRepo.join();
 

@@ -15,6 +15,7 @@ interface ChannelView {
 
 interface ChannelListProps {
   appRepo: AppRepo;
+  channels: string[];
   currentChannel?: string;
 
   onSwitchChannel(channelName: string): void;
@@ -72,9 +73,7 @@ class NewChannel extends React.Component<Pick<ChannelListProps, "onJoinChannel">
 export class ChannelList extends React.Component<ChannelListProps, never> {
 
   renderJoinedChannels() {
-    const { appRepo, currentChannel } = this.props;
-    const channels = Array.from(appRepo.appState.channels.keys());
-
+    const { appRepo, currentChannel, channels } = this.props;
     return channels.map(c => (
       <JoinedChannel
         key={c}

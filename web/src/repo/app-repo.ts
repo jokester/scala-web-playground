@@ -1,6 +1,6 @@
-import { ChannelRepo, ChannelStore } from "./channel-repo";
+import { ChannelRepo, ChannelState, ChannelStore } from "./channel-repo";
 import { action, observable, runInAction } from "mobx";
-import { WsState, createEventPipe } from "../realworld";
+import { createEventPipe, WsState } from "../realworld";
 import { ServerBroadcast } from "../../src-gen";
 import { Model } from "../model";
 import { getLogger, getWebpackEnv } from "../util";
@@ -91,9 +91,7 @@ export class AppRepo {
 
   @action
   getChannelRepo(channelName: string) {
-    Debug.assert(
-      this.appState.connStatus === WsState.connected && this.appState.identity,
-      "getChannelRepo() required auth");
+    this.assertAuthed();
     if (!this._channelRepos.has(channelName)) {
       const { conn, source, sink } = this.pipe;
       const newRepo = new ChannelRepo(channelName, this.appState.identity!, this._userPool, conn, source, sink);
@@ -101,5 +99,24 @@ export class AppRepo {
       this.appState.channels.set(channelName, newRepo);
     }
     return this._channelRepos.get(channelName)!;
+  }
+
+  @action
+  leaveChannel(channelName: string) {
+    this.assertAuthed();
+    const c = this._channelRepos.get(channelName)!;
+    if (c && c.state === ChannelState.joined) {
+      c.leave();
+      this._channelRepos.delete(channelName);
+      this.appState.channels.delete(channelName);
+      return;
+    }
+    throw new Error('attempted to leave a not-joined channel');
+  }
+
+  private assertAuthed() {
+    Debug.assert(
+      this.appState.connStatus === WsState.connected && this.appState.identity,
+      "getChannelRepo() required auth");
   }
 }

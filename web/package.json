@@ -2,7 +2,8 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
-  "scripts": { "start": "react-scripts start",
+  "scripts": {
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test:coverage": "react-scripts test --env=jsdom --coverage",
@@ -19,6 +20,7 @@
     "lodash-es": "^4.17.11",
     "loglevel": "^1.6.1",
     "mobx": "^5.5.0",
+    "mobx-react": "^5.4.3",
     "mobx-utils": "^5.0.2",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",

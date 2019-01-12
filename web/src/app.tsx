@@ -1,57 +1,99 @@
 import * as React from "react";
-import { DemoLayout } from "./ui/sketch/demo-layout";
-import { getWebpackEnv } from "./util";
-import { AppRepo } from "./repo/app-repo";
-import { createEventPipe } from "./realworld/ws-event-pipe";
-import { wait } from "./commonutil/async";
+import { AppRepo, WsState } from "./repo";
+import { injectMuiTheme } from "./ui/theme";
+import { ChannelList } from "./ui/parts";
+import { AppTitle } from "./ui/parts/app-title";
+import { Grid } from "@material-ui/core";
+import { ChannelDetail } from "./ui/parts/channel-detail";
+import { computed } from "mobx";
+import { Debug } from "./util/debug";
+import { getLogger } from "./util";
+import { observer } from "mobx-react";
 
-export class App extends React.Component {
-  render(): React.ReactNode {
-    return <DemoLayout/>;
+interface UiProps {
+  appRepo: AppRepo;
+}
+
+interface UIState {
+  // none for
+  currentChannel?: string;
+}
+
+const logger = getLogger('app.tsx', 'debug');
+
+@observer
+class AppLayout extends React.Component<UiProps, UIState> {
+
+  state: UIState = {};
+
+  get appRepo() {
+    return this.props.appRepo;
+  }
+
+  @computed
+  get channels() {
+    return Array.from(this.appRepo.appState.channels.keys());
+  }
+
+  onJoinChannel = (channelName: string) => {
+    logger.debug('onJoinChannel', channelName);
+
+    const { channels } = this;
+
+    if (channels.indexOf(channelName) < 0) {
+      this.appRepo.getChannelRepo(channelName).join();
+      this.setState(
+        {
+          currentChannel: channelName,
+        });
+    } else {
+      this.onSwitchChannel(channelName);
+    }
+  };
+
+  onSwitchChannel = (currentChannel: string) => {
+    logger.debug('onSwitchChannel', currentChannel);
+    this.setState({ currentChannel });
+  };
+
+  renderChannelList() {
+    const { appRepo, channels } = this;
+    const { currentChannel } = this.state;
+
+    return (
+      <ChannelList
+        appRepo={appRepo}
+        currentChannel={currentChannel}
+        onJoinChannel={this.onJoinChannel}
+        onSwitchChannel={this.onSwitchChannel}
+      />
+    );
+
+  }
+
+  renderChannelDetail() {
+    if (this.state.currentChannel) {
+      const cRepo = this.appRepo.getChannelRepo(this.state.currentChannel);
+      const userPool = this.appRepo.userPool;
+      return <ChannelDetail channelRepo={cRepo} userPool={userPool}/>;
+    }
+    return null;
+  }
+
+  render() {
+    const connecting = this.appRepo.appState.connStatus !== WsState.connected;
+    return (
+      <div className="" style={{ height: 'calc(100vh)', display: 'flex', }}>
+        <AppTitle connecting={connecting}/>
+        <Grid container className="grow-1" style={{ marginTop: 48, padding: 8, }}>
+          <Grid item xs={12} container>
+            {this.renderChannelList()}
+            {this.renderChannelDetail()}
+          </Grid>
+        </Grid>
+      </div>
+    );
   }
 }
 
-export function createRepo() {
-  const buildEnv = getWebpackEnv<{ REACT_APP_WS_URL: string }>();
-  const pipe = createEventPipe(buildEnv.REACT_APP_WS_URL);
-  const repo = new AppRepo(pipe);
-
-
-  return repo;
-}
-
-export async function tryRepo() {
-  const appRepo = createRepo();
-  await appRepo.startConnect();
-
-  await appRepo.auth("tryRepo", "otp");
-
-  const channelRepo = appRepo.getChannelRepo("chan1");
-
-  await channelRepo.join();
-
-  await channelRepo.sendMessage("chan1-msg1");
-
-  await wait(3e3);
-
-  await channelRepo.sendMessage("chan1-msg2");
-
-  await wait(3e3);
-
-  await channelRepo.leave();
-}
-
-export async function tryConnection() {
-  const buildEnv = getWebpackEnv<{ REACT_APP_WS_URL: string }>();
-  const pipe = createEventPipe(buildEnv.REACT_APP_WS_URL);
-  const appRepo = new AppRepo(pipe);
-  await appRepo.startConnect();
-  await appRepo.auth("nick", "otp");
-
-  const chan1 = await pipe.sink.joinChannel('chan1');
-  await pipe.sink.sendChat(chan1.channel.uuid, "mesg1");
-  await wait(3e3);
-  await pipe.sink.sendChat(chan1.channel.uuid, "mesg3");
-  await wait(3e3);
-  // await pipe.sink.leaveChannel(chan1.channel.uuid);
-}
+export const App = injectMuiTheme(AppLayout);

@@ -1,7 +1,7 @@
 import { getLogger, isDevBuild } from "../util";
 import { TypedEventEmitter } from "../util/typed-event-emitter";
 
-const logger = getLogger(__filename);
+const logger = getLogger('ws-conn');
 const MaxConnectionCount = 1;
 
 interface WsEventMap {

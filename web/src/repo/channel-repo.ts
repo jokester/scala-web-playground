@@ -1,14 +1,13 @@
 import { action, observable, runInAction } from "mobx";
 import { Model } from "../model";
 import { getLogger } from "../util";
-import { WsEventSource } from "../realworld/ws-event-source";
-import { WsEventSink } from "../realworld/ws-event-sink";
-import { WsConnection } from "../realworld/ws-connection";
+import { WsEventSource, WsEventSink, WsConnection } from "../realworld";
 import { ChatroomChatMessage, ServerChannelBroadcast, ServerJoinedChannel } from "../../src-gen";
 import { Debug } from "../util/debug";
 import { nonce8 } from "../util/string-util";
+import { TypedEventEmitter } from "../util/typed-event-emitter";
 
-const logger = getLogger(__filename);
+const logger = getLogger('chan-repo');
 
 export interface ChannelStore {
   state: ChannelState;
@@ -23,10 +22,14 @@ export enum ChannelState {
   left = "ChannelState.left",
 }
 
+interface ChannelRepoEventMap {
+  userRequestLeave: /* channelName */ string;
+}
+
 /**
  * mobx-observable repo
  */
-export class ChannelRepo implements ChannelStore {
+export class ChannelRepo extends TypedEventEmitter<ChannelRepoEventMap> implements ChannelStore {
 
   @observable
   state = ChannelState.left;
@@ -48,6 +51,7 @@ export class ChannelRepo implements ChannelStore {
               private readonly conn: WsConnection,
               private readonly eventSrc: WsEventSource,
               private readonly eventSink: WsEventSink) {
+    super();
   }
 
   @action
@@ -115,6 +119,7 @@ export class ChannelRepo implements ChannelStore {
   @action
   async leave() {
     this.assertState(ChannelState.joined);
+    this.emit("userRequestLeave", this.channelName);
     try {
       const { reason } = await this.eventSink.leaveChannel(this.uuid!);
       logger.debug(`left channel=${this.channelName}: ${reason}`);

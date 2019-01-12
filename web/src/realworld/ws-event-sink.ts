@@ -13,7 +13,7 @@ import {
 import { getLogger } from "../util";
 import { WsEventSource } from "./ws-event-source";
 
-const logger = getLogger(__filename);
+const logger = getLogger('ws-event-sink');
 
 export class WsEventSink {
   private readonly factory = new WsMessageFactory();

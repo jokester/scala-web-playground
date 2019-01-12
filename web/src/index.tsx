@@ -1,11 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
-import { App, createRepo, tryConnection, tryRepo } from './app';
+import { App } from './app';
 import * as serviceWorker from './serviceWorker';
 import { getLogger, isProdBuild } from "./util";
+import { createRepo } from "./repo/app-repo";
+import { tryRepo } from "./repo/dummy";
 
-const logger = getLogger(__filename, "debug");
+const logger = getLogger('src/index.tsx', "debug");
 
 function registerHMR() {
   type ModuleHMR = typeof module & {
@@ -19,12 +21,14 @@ function registerHMR() {
   }
 }
 
+const appRepo = createRepo();
+
 function render() {
   ReactDOM.render(
-    <App/>,
+    <App appRepo={appRepo}/>,
     document.getElementById('root') as HTMLElement
   );
-  logger.debug("rendered {}", { a: 1 }, process.env);
+  logger.debug("rendered");
 }
 
 if (isProdBuild) {
@@ -35,9 +39,7 @@ if (isProdBuild) {
   serviceWorker.unregister();
 } else {
   registerHMR();
+  tryRepo(appRepo);
 }
 
-registerHMR();
 render();
-
-tryRepo();

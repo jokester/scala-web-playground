@@ -11,7 +11,7 @@ import {
 import { TypedEventEmitter } from "../util/typed-event-emitter";
 import { getLogger } from "../util";
 
-const logger = getLogger(__filename);
+const logger = getLogger('ws-event-src');
 
 export interface DecodeEventMap {
   pong: ServerPong;
@@ -55,6 +55,7 @@ export class WsEventSource extends TypedEventEmitter<DecodeEventMap> {
    */
   feedMsg(raw: unknown) {
     try {
+      logger.debug("handling message", raw);
       this.doOnMsg(raw);
     } catch (e) {
       // not really necessary: bottom of call stack is likely to be an event handler
@@ -64,7 +65,7 @@ export class WsEventSource extends TypedEventEmitter<DecodeEventMap> {
 
   private doOnMsg(raw: unknown) {
     if (typeof raw !== 'string') {
-      logger.warn("got non-string raw message after JSON.parse");
+      logger.warn("got non-string raw message");
       return;
     }
 

@@ -1,11 +1,17 @@
-import { ChannelRepo, ChannelStore } from "./channel-repo";
+import { ChannelRepo, ChannelState, ChannelStore } from "./channel-repo";
 import { action, observable, runInAction } from "mobx";
-import { WsState } from "../realworld/ws-connection";
-import { createEventPipe } from "../realworld/ws-event-pipe";
+import { createEventPipe, WsState } from "../realworld";
 import { ServerBroadcast } from "../../src-gen";
 import { Model } from "../model";
-import { getLogger } from "../util";
+import { getLogger, getWebpackEnv } from "../util";
 import { Debug } from "../util/debug";
+import { DeepReadonly } from "../commonutil/type/freeze";
+
+export function createRepo() {
+  const buildEnv = getWebpackEnv<{ REACT_APP_WS_URL: string }>();
+  const pipe = createEventPipe(buildEnv.REACT_APP_WS_URL);
+  return new AppRepo(pipe);
+}
 
 export interface AppStore {
   connStatus: WsState;
@@ -13,7 +19,10 @@ export interface AppStore {
   channels: Map<string, ChannelStore>;
 }
 
-const logger = getLogger(__filename);
+// read-only obj pools for UI
+export type UserPool = ReadonlyMap<string, DeepReadonly<Model.User>>;
+
+const logger = getLogger('app-repo.ts');
 
 export class AppRepo {
 
@@ -24,9 +33,13 @@ export class AppRepo {
     channels: observable(new Map<string, ChannelStore>()),
   };
 
-  private readonly userPool = new Map<string, Model.User>();
+  get userPool(): UserPool {
+    return this._userPool;
+  }
 
-  private readonly channelRepos = new Map<string, ChannelRepo>();
+  private readonly _userPool = new Map<string, Model.User>();
+
+  private readonly _channelRepos = new Map<string, ChannelRepo>();
 
   /**
    * pipe: flow of WS messages  [repo -> pipe.sink -> pipe.conn -> pipe.source -> repo]
@@ -44,12 +57,14 @@ export class AppRepo {
     });
     source.on("broadcast", (m: ServerBroadcast) => {
       for (const u of m.newUsers) {
-        this.userPool.set(u.uuid, u);
+        this._userPool.set(u.uuid, u);
       }
       for (const c of m.channels) {
-        if (this.channelRepos.has(c.channelName)) {
-          const channelRepo = this.channelRepos.get(c.channelName)!;
+        if (this._channelRepos.has(c.channelName)) {
+          const channelRepo = this._channelRepos.get(c.channelName)!;
           channelRepo.onChannelBroadcast(c);
+        } else {
+          logger.warn("got broadcast from not joined channel", c);
         }
       }
     });
@@ -76,15 +91,35 @@ export class AppRepo {
 
   @action
   getChannelRepo(channelName: string) {
+    this.assertAuthed();
+    if (!this._channelRepos.has(channelName)) {
+      const { conn, source, sink } = this.pipe;
+      const newRepo = new ChannelRepo(channelName, this.appState.identity!, this._userPool, conn, source, sink);
+      this._channelRepos.set(channelName, newRepo);
+      this.appState.channels.set(channelName, newRepo);
+      newRepo.once('userRequestLeave', () => {
+        this.leaveChannel(channelName);
+      });
+    }
+    return this._channelRepos.get(channelName)!;
+  }
+
+  @action
+  private leaveChannel(channelName: string) {
+    this.assertAuthed();
+    const c = this._channelRepos.get(channelName)!;
+    if (c && c.state === ChannelState.joined) {
+      c.leave();
+      this._channelRepos.delete(channelName);
+      this.appState.channels.delete(channelName);
+      return;
+    }
+    throw new Error('attempted to leave a not-joined channel');
+  }
+
+  private assertAuthed() {
     Debug.assert(
       this.appState.connStatus === WsState.connected && this.appState.identity,
       "getChannelRepo() required auth");
-    if (!this.channelRepos.has(channelName)) {
-      const { conn, source, sink } = this.pipe;
-      const newRepo = new ChannelRepo(channelName, this.appState.identity!, this.userPool, conn, source, sink);
-      this.channelRepos.set(channelName, newRepo);
-      this.appState.channels.set(channelName, newRepo);
-    }
-    return this.channelRepos.get(channelName)!;
   }
 }

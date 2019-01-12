@@ -5,7 +5,7 @@ import { App } from './app';
 import * as serviceWorker from './serviceWorker';
 import { getLogger, isProdBuild } from "./util";
 import { createRepo } from "./repo/app-repo";
-import { tryRepo } from "./repo/dummy";
+import { defaultRoutine, tryRepoRoutine } from "./repo/dummy";
 
 const logger = getLogger('src/index.tsx', "debug");
 
@@ -37,9 +37,11 @@ if (isProdBuild) {
   // unregister() to register() below. Note this comes with some pitfalls.
   // Learn more about service workers: http://bit.ly/CRA-PWA
   serviceWorker.unregister();
+  defaultRoutine(appRepo);
+
 } else {
   registerHMR();
-  tryRepo(appRepo);
+  tryRepoRoutine(appRepo);
 }
 
 render();

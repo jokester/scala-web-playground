@@ -3,11 +3,31 @@ import { AppRepo, createRepo } from "./app-repo";
 import { wait } from "../commonutil/async";
 import { createEventPipe } from "../realworld";
 
-export async function tryRepo(appRepo: AppRepo) {
+export async function defaultRoutine(appRepo: AppRepo) {
+  await wait(1e3);
+
+  await appRepo.startConnect();
+
+  const userName = (prompt("Input a username", "Anonymous User") || '').trim();
+
+  if (!userName) {
+    alert("Username cannot be empty. Refresh page to try again");
+    return;
+  }
+
+  await appRepo.auth(userName, "otp");
+
+  const channelRepo = appRepo.createChannelRepo("general");
+
+  await channelRepo.join();
+}
+
+export async function tryRepoRoutine(appRepo: AppRepo) {
+
   await wait(1e3);
   await appRepo.startConnect();
 
-  await appRepo.auth("tryRepo", "otp");
+  await appRepo.auth("tryRepoRoutine", "otp");
 
   const channelRepo = appRepo.createChannelRepo("chan1");
 

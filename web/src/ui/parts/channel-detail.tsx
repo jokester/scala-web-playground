@@ -20,6 +20,11 @@ const logger = getLogger('channel-detail');
 @observer
 export class ChannelDetail extends React.Component<ChannelDetailProps> {
 
+  onSubmit = (text: string) => {
+    const { channelRepo, userPool } = this.props;
+    channelRepo.sendMessage(text);
+  }
+
   render() {
     const { channelRepo, userPool } = this.props;
 
@@ -34,7 +39,7 @@ export class ChannelDetail extends React.Component<ChannelDetailProps> {
         <div className="grow-1 chat-history">
           <MessageList messages={messages} userPool={userPool}/>
         </div>
-        <MessageDraft/>
+        <MessageDraft onSubmit={this.onSubmit}/>
       </Grid>
     );
   }

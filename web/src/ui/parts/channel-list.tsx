@@ -1,14 +1,16 @@
 import * as React from "react";
-import { Avatar, Grid, List, ListItem, ListItemText, Input, Button } from "@material-ui/core/es";
+import { Avatar, Button, Grid, Input, List, ListItem, ListItemText } from "@material-ui/core/es";
 import { Group as GroupIcon, GroupAdd as GroupAddIcon } from "@material-ui/icons";
 import { lazyComponent } from "../util/lazy-component";
 import { AppRepo } from "../../repo";
 import { observer } from "mobx-react";
+import { ChannelState } from "../../repo/channel-repo";
 
 interface ChannelView {
   name: string;
   userCount: number;
   selected: boolean;
+  state: ChannelState;
 }
 
 interface ChannelListProps {
@@ -27,8 +29,9 @@ const JoinedChannel = lazyComponent((props: ChannelView & Pick<ChannelListProps,
     <Avatar>
       <GroupIcon/>
     </Avatar>
-    <ListItemText secondary={props.userCount > 1 ? `${props.userCount} users online` : `${props.userCount} user online`}>
-      {props.name}
+    <ListItemText>
+      <div> {`${props.name} / ${props.userCount} user (s)`} </div>
+      <Button variant="contained" color="primary" disabled={props.state !== ChannelState.joined} onClick={() => props.onLeaveChannel(props.name)}>Leave</Button>
     </ListItemText>
   </ListItem>
 ));
@@ -57,7 +60,7 @@ class NewChannel extends React.Component<Pick<ChannelListProps, "onJoinChannel">
         </Avatar>
         <ListItemText>
           <Input placeholder="Channel name" onChange={this.onChange} value={this.state.channelName}/>
-          {" "}
+          <br/>
           <Button variant="contained" color="primary" disabled={!this.state.channelName} onClick={this.onSubmit}>Join</Button>
         </ListItemText>
       </ListItem>
@@ -77,6 +80,7 @@ export class ChannelList extends React.Component<ChannelListProps, never> {
         key={c}
         selected={c === currentChannel}
         name={c}
+        state={appRepo.getChannelRepo(c)!.state}
         userCount={appRepo.appState.channels.get(c)!.userUuids.length}
         onSwitchChannel={this.props.onSwitchChannel}
         onLeaveChannel={this.props.onLeaveChannel}

@@ -62,7 +62,10 @@ export class ChannelRepo implements ChannelStore {
 
   @action
   async sendMessage(text: string) {
-    this.assertState(ChannelState.joined);
+    if (this.state !== ChannelState.joined) {
+      logger.warn("trying to send text when not joined");
+      return;
+    }
 
     const tmpMessage: Model.ChatMessage = {
       text,
@@ -112,15 +115,15 @@ export class ChannelRepo implements ChannelStore {
 
   @action
   async leave() {
+    if (this.state === ChannelState.left) {
+      return;
+    }
     this.assertState(ChannelState.joined);
+    this.state = ChannelState.left;
     try {
       const { reason } = await this.eventSink.leaveChannel(this.uuid!);
       logger.debug(`left channel=${this.channelName}: ${reason}`);
     } finally {
-      runInAction(() => {
-        this.uuid = undefined;
-        this.state = ChannelState.left;
-      });
     }
   }
 

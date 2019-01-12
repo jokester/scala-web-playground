@@ -30,7 +30,6 @@ class AppLayout extends React.Component<UiProps, UIState> {
     return this.props.appRepo;
   }
 
-  @computed
   get channels() {
     return Array.from(this.appRepo.appState.channels.keys());
   }
@@ -55,10 +54,10 @@ class AppLayout extends React.Component<UiProps, UIState> {
     logger.debug('onLeaveChannel', channelName);
 
     const { channels } = this;
-    if (channels.indexOf(channelName)) {
+    if (channels.indexOf(channelName) >= 0) {
       this.appRepo.leaveChannel(channelName);
     }
-  }
+  };
 
   onSwitchChannel = (currentChannel: string) => {
     logger.debug('onSwitchChannel', currentChannel);
@@ -66,7 +65,7 @@ class AppLayout extends React.Component<UiProps, UIState> {
   };
 
   renderChannelList() {
-    const { appRepo, channels } = this;
+    const { appRepo } = this;
     const { currentChannel } = this.state;
 
     return (
@@ -78,7 +77,6 @@ class AppLayout extends React.Component<UiProps, UIState> {
         onLeaveChannel={this.onLeaveChannel}
       />
     );
-
   }
 
   renderChannelDetail() {

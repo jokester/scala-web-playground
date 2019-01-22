@@ -9,6 +9,7 @@ import { observer } from "mobx-react";
 import { Model } from "../../model";
 import { UserPool } from "../../repo/app-repo";
 import { getLogger } from "../../util";
+import { KeyboardEventHandler } from "react";
 
 interface ChannelDetailProps {
   channelRepo: ChannelRepo;
@@ -55,7 +56,7 @@ class MessageDraft extends React.Component<{ submitDisabled?: boolean, onSubmit?
   };
 
   onSubmit = () => {
-    if (this.props.onSubmit) {
+    if (this.state.draft && this.props.onSubmit) {
       this.props.onSubmit(this.state.draft);
       this.setState({ draft: '' });
     }
@@ -63,6 +64,16 @@ class MessageDraft extends React.Component<{ submitDisabled?: boolean, onSubmit?
 
   onChange = (ev: ChangeEvent<HTMLTextAreaElement>) => {
     this.setState({ draft: ev.target.value });
+  };
+
+  onKeyPress = (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (ev.keyCode === 13 && !ev.altKey && !ev.ctrlKey && !ev.shiftKey) {
+      // FIXME: likely to have bugs. should test with IMEs and stuff.
+      ev.stopPropagation();
+      ev.preventDefault();
+      this.onSubmit();
+    } else {
+    }
   };
 
   render() {
@@ -73,6 +84,7 @@ class MessageDraft extends React.Component<{ submitDisabled?: boolean, onSubmit?
         <textarea className="grow-1"
                   style={{ height: 64, resize: 'none', }}
                   onChange={this.onChange}
+                  onKeyDown={this.onKeyPress}
                   value={draft}
                   placeholder="content here"
         />
@@ -122,7 +134,7 @@ const MessageListItem = lazyComponent(
         <Typography variant="subtitle2">
           {`${date} / ${u.name}:`}
         </Typography>
-        <Typography>
+        <Typography component="pre">
           {msg.text}
         </Typography>
       </Paper>

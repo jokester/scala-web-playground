@@ -8,6 +8,7 @@ import { Debug } from "../util/debug";
 import { DeepReadonly } from "../commonutil/type/freeze";
 
 export function createRepo() {
+  // FIXME: should disable retry of ws, and alert when disconnected
   const buildEnv = getWebpackEnv<{ REACT_APP_WS_URL: string }>();
   const pipe = createEventPipe(buildEnv.REACT_APP_WS_URL);
   return new AppRepo(pipe);

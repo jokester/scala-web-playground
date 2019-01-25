@@ -23,16 +23,15 @@ message UserInfo {
 }
 
 message ChannelInfo {
-  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["name", "uuid"] } };
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["name"] } };
   string name = 1;
-  string uuid = 2;
 }
 
 message ChatMessage {
-  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["uuid", "userUuid", "channelUuid", "text", "timestamp"] } };
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["uuid", "userUuid", "channelName", "text", "timestamp"] } };
   string uuid        = 9; // primary key
   string userUuid    = 10;
-  string channelUuid = 12;
+  string channelName = 12;
   string text        = 13;
   // grpc-gateway: int32 -> number@JS
   // grpc-gateway: int64 -> string@JS
@@ -65,14 +64,14 @@ message User {
     string name = 2;
   }
   message LeaveChannel {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "channelUuid"] } };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "channelName"] } };
     Command cmd         = 1;
-    string  channelUuid = 3;
+    string  channelName = 3;
   }
   message SendChat {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "channelUuid", "text"] } };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["cmd", "channelName", "text"] } };
     Command cmd         = 1;
-    string  channelUuid = 3;
+    string  channelName = 3;
     string  text        = 4;
   }
 }
@@ -112,9 +111,8 @@ message Server {
     ChatMessage msg = 2;
   }
   message ChannelBroadcast {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["channelName", "channelUuid", "joinedUsers", "leftUsers", "newMessages" ] } };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = { json_schema: { required: ["channelName", "joinedUsers", "leftUsers", "newMessages" ] } };
     string channelName               = 1;
-    string channelUuid               = 2;
     repeated string joinedUsers      = 3;
     repeated string leftUsers        = 4;
     repeated ChatMessage newMessages = 5;

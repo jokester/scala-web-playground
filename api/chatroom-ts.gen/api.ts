@@ -90,12 +90,6 @@ export interface ChatroomChannelInfo {
      * @memberof ChatroomChannelInfo
      */
     name: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ChatroomChannelInfo
-     */
-    uuid: string;
 }
 
 /**
@@ -121,7 +115,7 @@ export interface ChatroomChatMessage {
      * @type {string}
      * @memberof ChatroomChatMessage
      */
-    channelUuid: string;
+    channelName: string;
     /**
      * 
      * @type {string}
@@ -254,12 +248,6 @@ export interface ServerChannelBroadcast {
      * @memberof ServerChannelBroadcast
      */
     channelName: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ServerChannelBroadcast
-     */
-    channelUuid: string;
     /**
      * 
      * @type {Array&lt;string&gt;}
@@ -443,7 +431,7 @@ export interface UserLeaveChannel {
      * @type {string}
      * @memberof UserLeaveChannel
      */
-    channelUuid: string;
+    channelName: string;
 }
 
 /**
@@ -477,7 +465,7 @@ export interface UserSendChat {
      * @type {string}
      * @memberof UserSendChat
      */
-    channelUuid: string;
+    channelName: string;
     /**
      * 
      * @type {string}

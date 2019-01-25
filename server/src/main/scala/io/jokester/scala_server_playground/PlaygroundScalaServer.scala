@@ -1,15 +1,16 @@
 package io.jokester.scala_server_playground
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.server.{ HttpApp, Route }
-import io.jokester.scala_server_playground.blob.{ BlobHandler, BlobRepoPG }
+import akka.http.scaladsl.server.{HttpApp, Route}
+import com.typesafe.scalalogging.LazyLogging
+import io.jokester.scala_server_playground.blob.{BlobHandler, BlobRepoPG}
 import io.jokester.scala_server_playground.chatroom.ChatroomHandler
 import io.jokester.scala_server_playground.hello.HelloHandler
 import io.jokester.scala_server_playground.toy.ToyHandler
 import io.jokester.scala_server_playground.util.RealWorld
 import io.jokester.scala_server_playground.ws.WsEchoHandler
 import scalikejdbc.config.DBs
-import scalikejdbc.{ ConnectionPool, DB, GlobalSettings, LoggingSQLAndTimeSettings }
+import scalikejdbc.{ConnectionPool, DB, GlobalSettings, LoggingSQLAndTimeSettings}
 
 import scala.concurrent.ExecutionContextExecutor
 
@@ -20,7 +21,9 @@ object PlaygroundScalaServer extends HttpApp {
     GlobalSettings.loggingSQLAndTime = LoggingSQLAndTimeSettings(
       enabled = true,
       singleLineMode = true,
-      logLevel = 'DEBUG)
+      warningEnabled = true,
+      logLevel = 'DEBUG
+    )
   }
 
   implicit def system: ActorSystem = systemReference.get
@@ -53,17 +56,16 @@ object PlaygroundScalaServer extends HttpApp {
   }
 }
 
-object Bootstrap extends App {
+object Bootstrap extends App with LazyLogging {
 
   DBs.setupAll
 
   val interface = "localhost"
   val port = 18080
 
+  // blocking until Enter
   PlaygroundScalaServer.startServer(interface, port)
-  println(s"Server is now online at http://127.0.0.1:$port\nPress RETURN to stop...")
 
-  println("Server is down...")
-
+  println("Server is down... terminating")
   PlaygroundScalaServer.system.terminate()
 }

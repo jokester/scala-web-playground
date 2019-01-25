@@ -3,19 +3,20 @@ package io.jokester.scala_server_playground.util
 import java.sql.PreparedStatement
 import java.util.UUID
 
-import scalikejdbc.{ ParameterBinderFactory, ParameterBinderWithValue }
-import spray.json.{ JsString, JsValue, JsonFormat }
+import scalikejdbc.{ParameterBinderFactory, ParameterBinderWithValue}
+import spray.json.{JsString, JsValue, JsonFormat}
 
 object UUID4pg {
 
-  implicit val uuidBinder: ParameterBinderFactory[UUID] = (uuid: UUID) => new ParameterBinderWithValue {
-    val value: UUID = uuid
+  implicit val uuidBinder: ParameterBinderFactory[UUID] = (uuid: UUID) =>
+    new ParameterBinderWithValue {
+      val value: UUID = uuid
 
-    override def toString(): String = s"uuid(${uuid.toString})"
+      override def toString(): String = s"uuid(${uuid.toString})"
 
-    override def apply(stmt: PreparedStatement, idx: Int): Unit = {
-      stmt.setObject(idx, uuid)
-    }
+      override def apply(stmt: PreparedStatement, idx: Int): Unit = {
+        stmt.setObject(idx, uuid)
+      }
   }
 }
 

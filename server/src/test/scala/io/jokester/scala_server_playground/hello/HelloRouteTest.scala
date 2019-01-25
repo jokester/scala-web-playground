@@ -1,10 +1,9 @@
-package io.jokester.learning.scala_server.toy
+package io.jokester.scala_server_playground.hello
 
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import io.jokester.scala_server_playground.hello.HelloHandler
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 
 class HelloRouteTest extends WordSpec with Matchers with ScalatestRouteTest {
 

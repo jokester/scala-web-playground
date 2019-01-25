@@ -21,8 +21,8 @@ trait BlobRepo {
 
   def getBlobMeta(id: UUID): Option[BlobMeta]
 
-  private def toUUID(uuid: String): Option[UUID] = Try {
-    UUID.fromString(uuid)
-  }.toOption
+  private def toUUID(uuid: String): Option[UUID] =
+    Try {
+      UUID.fromString(uuid)
+    }.toOption
 }
-

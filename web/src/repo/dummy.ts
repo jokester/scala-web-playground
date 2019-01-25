@@ -47,9 +47,9 @@ export async function tryConnection() {
   await appRepo.auth("nick", "otp");
 
   const chan1 = await pipe.sink.joinChannel('chan1');
-  await pipe.sink.sendChat(chan1.channel.uuid, "mesg1");
+  await pipe.sink.sendChat(chan1.channel.name, "mesg1");
   await wait(3e3);
-  await pipe.sink.sendChat(chan1.channel.uuid, "mesg3");
+  await pipe.sink.sendChat(chan1.channel.name, "mesg3");
   await wait(3e3);
   // await pipe.sink.leaveChannel(chan1.channel.uuid);
 }

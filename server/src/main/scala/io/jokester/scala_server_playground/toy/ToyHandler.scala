@@ -8,13 +8,15 @@ import io.circe.syntax._
 import io.jokester.scala_server_playground.util.Catch404
 import scalikejdbc.DB
 
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{ Failure, Success }
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
-class ToyHandler(getDB: () => DB)(implicit e: ExecutionContext) extends Catch404 {
+class ToyHandler(getDB: () => DB)(implicit e: ExecutionContext)
+    extends Catch404 {
 
   private implicit def convert(toyState: ToyState): HttpResponse = {
-    val body = HttpEntity(ContentTypes.`application/json`, toyState.asJson.noSpaces)
+    val body =
+      HttpEntity(ContentTypes.`application/json`, toyState.asJson.noSpaces)
     HttpResponse(entity = body)
   }
 
@@ -35,7 +37,7 @@ class ToyHandler(getDB: () => DB)(implicit e: ExecutionContext) extends Catch404
   def completeWith(s: Future[ToyState]): Route = {
     onComplete(s) {
       case Success(state) => complete(state: HttpResponse)
-      case Failure(ex) => failWith(ex)
+      case Failure(ex)    => failWith(ex)
     }
   }
 

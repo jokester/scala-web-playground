@@ -4,9 +4,12 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model._
 import akka.util.ByteString
 import com.typesafe.scalalogging.LazyLogging
-import spray.json.{ DefaultJsonProtocol, RootJsonFormat }
+import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
-trait BlobSerialization extends SprayJsonSupport with DefaultJsonProtocol with LazyLogging {
+trait BlobSerialization
+    extends SprayJsonSupport
+    with DefaultJsonProtocol
+    with LazyLogging {
 
   import io.jokester.scala_server_playground.util.UUID4json.UuidJsonFormat
 
@@ -27,7 +30,11 @@ trait BlobSerialization extends SprayJsonSupport with DefaultJsonProtocol with L
   def toContentType(s: String): ContentType = {
     ContentType.parse(s) match {
       case Left(errors) =>
-        logger.warn(s"failed to parse content type: {} / {}", s: Any, errors: Any)
+        logger.warn(
+          s"failed to parse content type: {} / {}",
+          s: Any,
+          errors: Any
+        )
         ContentTypes.`application/octet-stream`
       case Right(m) => m
     }

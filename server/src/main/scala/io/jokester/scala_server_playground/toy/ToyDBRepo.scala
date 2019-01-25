@@ -25,7 +25,6 @@ class ToyDBRepoBasic(db: () => DB) extends ToyRepo with LazyLogging {
   import ToyStateDB._
 
   private def syncGetState(): ToyState = db() readOnly { implicit session =>
-
     val t = ToyState.syntax("t")
     sql"""
      SELECT ${t.result.*} FROM ${ToyState as t} ORDER BY revision DESC LIMIT 1 ;
@@ -42,36 +41,41 @@ class ToyDBRepoBasic(db: () => DB) extends ToyRepo with LazyLogging {
 
   override def getState: Future[ToyState] = Future.successful(syncGetState())
 
-  override def mutateState(a: ToyAction): Future[ToyState] = db() localTx { implicit session =>
-    val s = syncGetState()
-    val newState = s.reduce(a)
-    syncInsert(newState)
-    Future.successful(newState)
+  override def mutateState(a: ToyAction): Future[ToyState] = db() localTx {
+    implicit session =>
+      val s = syncGetState()
+      val newState = s.reduce(a)
+      syncInsert(newState)
+      Future.successful(newState)
   }
 }
 
-class ToyDBRepoNolock(db: () => DB) extends ToyDBRepoBasic(db) with LazyLogging {
+class ToyDBRepoNolock(db: () => DB)
+    extends ToyDBRepoBasic(db)
+    with LazyLogging {
 
   import ToyStateDB._
 
   /**
-   * OrigSQL:
-   *
-   * @param a
-   * @return
-   */
-  private def syncMutate(a: ToyAction): ToyState = db() localTx { implicit session =>
-    val t = ToyState.syntax("t")
+    * OrigSQL:
+    *
+    * @param a
+    * @return
+    */
+  private def syncMutate(a: ToyAction): ToyState = db() localTx {
+    implicit session =>
+      val t = ToyState.syntax("t")
 
-    sql"""
+      sql"""
     INSERT INTO toystate
         (SELECT (1 + revision) AS revision, (${a.delta} + value) AS value FROM toystate ORDER BY revision DESC LIMIT 1)
     RETURNING *;
     """.map(ToyState(_)).first().apply().get
   }
 
-  override def mutateState(a: ToyAction): Future[ToyState] = db() localTx { implicit session =>
-    val newState = syncMutate(a)
-    Future.successful(newState)
+  override def mutateState(a: ToyAction): Future[ToyState] = db() localTx {
+    implicit session =>
+      val newState = syncMutate(a)
+      Future.successful(newState)
   }
 }

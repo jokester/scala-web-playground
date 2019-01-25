@@ -59,8 +59,8 @@ export class WsEventSink {
     return this.eventSource.nextOfSeq<ServerLeftChannel>(msg.cmd.seq);
   }
 
-  sendChat(channelUuid: string, text: string) {
-    const msg = this.factory.sendChat(channelUuid, text);
+  sendChat(channelName: string, text: string) {
+    const msg = this.factory.sendChat(channelName, text);
     this.conn.sendMessage(msg);
     return this.eventSource.nextOfSeq<ServerSentChat>(msg.cmd.seq);
   }
@@ -93,16 +93,16 @@ class WsMessageFactory {
     };
   }
 
-  leaveChannel(channelUuid: string): UserLeaveChannel {
+  leaveChannel(channelName: string): UserLeaveChannel {
     return {
-      channelUuid,
+      channelName,
       cmd: this.createCmd("LeaveChannel"),
     };
   }
 
-  sendChat(channelUuid: string, text: string): UserSendChat {
+  sendChat(channelName: string, text: string): UserSendChat {
     return {
-      channelUuid,
+      channelName,
       text,
       cmd: this.createCmd("SendChat"),
     };

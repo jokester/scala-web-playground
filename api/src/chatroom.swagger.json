@@ -230,9 +230,6 @@
         "channelName": {
           "type": "string"
         },
-        "channelUuid": {
-          "type": "string"
-        },
         "joinedUsers": {
           "type": "array",
           "items": {
@@ -254,7 +251,6 @@
       },
       "required": [
         "channelName",
-        "channelUuid",
         "joinedUsers",
         "leftUsers",
         "newMessages"
@@ -381,13 +377,13 @@
         "cmd": {
           "$ref": "#/definitions/chatroomCommand"
         },
-        "channelUuid": {
+        "channelName": {
           "type": "string"
         }
       },
       "required": [
         "cmd",
-        "channelUuid"
+        "channelName"
       ]
     },
     "UserPing": {
@@ -407,7 +403,7 @@
         "cmd": {
           "$ref": "#/definitions/chatroomCommand"
         },
-        "channelUuid": {
+        "channelName": {
           "type": "string"
         },
         "text": {
@@ -416,7 +412,7 @@
       },
       "required": [
         "cmd",
-        "channelUuid",
+        "channelName",
         "text"
       ]
     },
@@ -425,14 +421,10 @@
       "properties": {
         "name": {
           "type": "string"
-        },
-        "uuid": {
-          "type": "string"
         }
       },
       "required": [
-        "name",
-        "uuid"
+        "name"
       ]
     },
     "chatroomChatMessage": {
@@ -444,7 +436,7 @@
         "userUuid": {
           "type": "string"
         },
-        "channelUuid": {
+        "channelName": {
           "type": "string"
         },
         "text": {
@@ -458,7 +450,7 @@
       "required": [
         "uuid",
         "userUuid",
-        "channelUuid",
+        "channelName",
         "text",
         "timestamp"
       ]

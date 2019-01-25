@@ -7,4 +7,3 @@ trait ToyRepo {
 
   def mutateState(a: ToyAction): Future[ToyState]
 }
-

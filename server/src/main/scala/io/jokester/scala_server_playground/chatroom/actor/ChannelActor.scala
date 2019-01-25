@@ -1,49 +1,64 @@
 package io.jokester.scala_server_playground.chatroom.actor
 
-import akka.actor.{ Actor, ActorLogging, ActorRef, Props }
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import io.jokester.scala_server_playground.chatroom.ChatroomRepo
 import io.jokester.scala_server_playground.chatroom.Internal._
 import io.jokester.scala_server_playground.util.ActorLifecycleLogging
 
 object ChannelActor {
-  def props(channel: Channel) = Props(new ChannelActor(channel))
+  def props(channel: Channel, repo: ChatroomRepo) = Props(new ChannelActor(channel, repo))
+  val InMemoryMessageCount = 1000
 }
 
-class ChannelActor(thisChannel: Channel) extends Actor with ActorLogging with ActorLifecycleLogging {
+class ChannelActor(thisChannel: Channel, repo: ChatroomRepo)
+    extends Actor
+    with ActorLogging
+    with ActorLifecycleLogging {
 
   import io.jokester.scala_server_playground.chatroom.Internal._
 
   private var users = Map.empty[User, ActorRef]
   private var userSet = Set.empty[User]
+  var recentMessages: Seq[ChatMessage] = repo.listMessage(thisChannel.name, ChannelActor.InMemoryMessageCount)
 
   override def receive: Receive = {
     case JoinRequest(user, _, userActor) if !users.contains(user) =>
       users += user -> userActor
       userSet += user
-      userActor ! ChannelBroadcast(thisChannel, userSet, /* FIXME: recent messages */ Seq())
+      userActor ! ChannelBroadcast(
+        thisChannel,
+        userSet,
+        recentMessages
+      )
       onUsersChange()
 
-    case LeaveRequest(user, channelUuid) if users.contains(user) && channelUuid == thisChannel.uuid =>
+    case LeaveRequest(user, channelName)
+        if users.contains(user) && channelName == thisChannel.name =>
       removeUser(user)
       onUsersChange()
 
-    case SendMessageRequest(user, chatMsg) if users.contains(user) && chatMsg.channelUuid == thisChannel.uuid =>
-      // TODO: persist message?
-      sender ! SendMessageResponse(chatMsg.uuid)
-      val broadcast = ChannelBroadcast(thisChannel, userSet, Seq(chatMsg))
-      for ((_, userActor) <- users) {
-        userActor ! broadcast
-      }
+    case SendMessageRequest(user, channelName, text, seq)
+        if users.contains(user) && channelName == thisChannel.name =>
+      val chatMsg = repo.createMessage(user, thisChannel, text)
+      sender ! SendMessageResponse(seq, chatMsg)
+      broadcastMessage(chatMsg)
 
-    case UserDisconnected(userUuid) =>
-      for (user <- userSet.find(u => u.uuid == userUuid)) {
-        removeUser(user)
-      }
+    case UserDisconnected(Some(user)) if userSet.contains(user) =>
+      removeUser(user)
       onUsersChange()
   }
 
   private def removeUser(user: User): Unit = {
     users -= user
     userSet -= user
+  }
+
+  private def broadcastMessage(chatMsg: ChatMessage): Unit = {
+    val broadcast = ChannelBroadcast(thisChannel, userSet, Seq(chatMsg))
+    for ((_, userActor) <- users) {
+      userActor ! broadcast
+    }
+    recentMessages = (recentMessages :+ chatMsg).takeRight(ChannelActor.InMemoryMessageCount)
   }
 
   private def onUsersChange(): Unit = {

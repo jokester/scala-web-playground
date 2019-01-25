@@ -38,6 +38,9 @@ lazy val root = (project in file(".")).
       "io.circe" %% "circe-parser" % circeVersion,
       "org.typelevel" %% "cats-core" % catsVersion,
 
+      // redis
+      "net.debasishg" %% "redisclient" % "3.9",
+
       // util
       "com.gilt" %% "gfc-guava" % "0.3.1",
       "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
@@ -76,3 +79,9 @@ enablePlugins(ScalikejdbcPlugin)
 // D: print duration  / F: full stack trace
 testOptions in Test += Tests.Argument("-oDF")
 
+libraryDependencies ++= Seq(
+  compilerPlugin("com.github.ghik" %% "silencer-plugin" % "1.3.1"),
+  "com.github.ghik" %% "silencer-lib" %  "1.3.1" % Provided
+)
+
+scalacOptions += "-P:silencer:pathFilters=/src_managed/"

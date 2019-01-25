@@ -23,11 +23,12 @@ class ToyRepoMemorySynced extends ToyRepo {
     }
   }
 
-  override def mutateState(action: ToyAction): Future[ToyState] = Future.successful {
-    synchronized {
-      val newState = state.reduce(action)
-      state = newState
-      newState
+  override def mutateState(action: ToyAction): Future[ToyState] =
+    Future.successful {
+      synchronized {
+        val newState = state.reduce(action)
+        state = newState
+        newState
+      }
     }
-  }
 }

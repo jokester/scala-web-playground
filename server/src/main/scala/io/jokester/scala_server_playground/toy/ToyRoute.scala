@@ -1,6 +1,6 @@
 package io.jokester.scala_server_playground.toy
 
-import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, StatusCode }
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCode}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import com.typesafe.scalalogging.LazyLogging

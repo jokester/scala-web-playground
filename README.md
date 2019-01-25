@@ -1,4 +1,4 @@
-# scala-web-playground
+# scala-server-playground
 
 a playground for scala/akka web server
 

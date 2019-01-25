@@ -3,17 +3,20 @@ package io.jokester.scala_server_playground.chatroom.actor
 import java.util.UUID
 
 import akka.actor._
-import akka.pattern.ask
-import io.jokester.scala_server_playground.chatroom.{ Internal, ServerMessage, UserMessage }
-import io.jokester.scala_server_playground.util.{ ActorLifecycleLogging, Entropy, RealWorld }
+import io.jokester.scala_server_playground.chatroom.{ChatroomRepo, Internal, ServerMessage, UserMessage}
+import io.jokester.scala_server_playground.util.ActorLifecycleLogging
 
 object UserActor {
   // type-checked and by-value way to create Props
   // see https://blog.codecentric.de/en/2017/03/akka-best-practices-defining-actor-props/
-  def props(uuid: UUID, daemon: ActorRef) = Props(new UserActor(uuid, daemon, e = RealWorld))
+  def props(daemon: ActorRef, repo: ChatroomRepo) =
+    Props(new UserActor(daemon, repo))
 }
 
-class UserActor(uuid: UUID, daemon: ActorRef, e: Entropy) extends Actor with ActorLogging with ActorLifecycleLogging {
+class UserActor(daemon: ActorRef, repo: ChatroomRepo)
+    extends Actor
+    with ActorLogging
+    with ActorLifecycleLogging {
 
   import Internal._
 
@@ -21,8 +24,8 @@ class UserActor(uuid: UUID, daemon: ActorRef, e: Entropy) extends Actor with Act
   private var outgoing: Option[ActorRef] = None
   private var userIdentity: Option[User] = None
   private var channelsJoining: Map[String, Int] = Map.empty
-  private var channelsJoined: Map[UUID, ActorRef] = Map.empty
-  private var messagesSending: Map[UUID, (Int, ChatMessage)] = Map.empty
+  private var channelsJoined: Map[String, ActorRef] = Map.empty
+  private var messagesSending: Set[Int] = Set.empty
   private var clientKnownUsers: Set[User] = Set.empty
   private var channelMembers: Map[UUID, Set[User]] = Map.empty
 
@@ -36,7 +39,7 @@ class UserActor(uuid: UUID, daemon: ActorRef, e: Entropy) extends Actor with Act
   private def connected: Receive = wrapContext {
     // silly way to keep as a PartialFunction
     case UserMessage.Auth(seq, name, otp) if otp == "otp" =>
-      val userInfo = User(name, uuid)
+      val userInfo = repo.createUser(name)
       this.userIdentity = Some(userInfo)
       outgoing.get ! ServerMessage.Authed(seq, userInfo)
       daemon ! UserAuthed(userInfo)
@@ -48,39 +51,46 @@ class UserActor(uuid: UUID, daemon: ActorRef, e: Entropy) extends Actor with Act
       channelsJoining += name -> seq
       daemon ! JoinRequest(from = userIdentity.get, name, self)
 
-    case UserMessage.LeaveChannel(seq, channelUuid) if channelsJoined.contains(channelUuid) =>
-      daemon ! LeaveRequest(userIdentity.get, channelUuid)
+    case UserMessage.LeaveChannel(seq, channelName)
+        if channelsJoined.contains(channelName) =>
+      daemon ! LeaveRequest(userIdentity.get, channelName)
       outgoing.get ! ServerMessage.LeftChannel(seq, "voluntarily")
-      channelsJoined -= channelUuid
+      channelsJoined -= channelName
 
-    case UserMessage.SendChatMessage(seq, channelUuid, text) if channelsJoined contains channelUuid =>
-      val msg = ChatMessage(
-        uuid = e.nextUUID(),
-        userUuid = userIdentity.get.uuid,
-        channelUuid = channelUuid,
+    case UserMessage.SendChatMessage(seq, channelName, text)
+        if channelsJoined contains channelName =>
+      val channelActor = channelsJoined(channelName)
+      messagesSending += seq
+      channelActor ! SendMessageRequest(
+        from = userIdentity.get,
+        channelName = channelName,
         text = text,
-        timestamp = e.currentServerTime())
-      messagesSending += msg.uuid -> (seq, msg)
-      channelsJoined(channelUuid) ! SendMessageRequest(userIdentity.get, msg)
+        seq = seq
+      )
 
-    case SendMessageResponse(messageUuid) if messagesSending contains messageUuid =>
-      val (seq, msg) = messagesSending(messageUuid)
-      messagesSending -= messageUuid
-      outgoing.get ! ServerMessage.SentMessage(seq, msg)
+    case SendMessageResponse(seq, message)
+        if messagesSending contains seq =>
+      messagesSending -= seq
+      outgoing.get ! ServerMessage.SentMessage(seq, message)
 
-    case b @ ChannelBroadcast(channel, users, messages) if channelsJoining.contains(channel.name) =>
+    case b @ ChannelBroadcast(channel, users, messages)
+        if channelsJoining.contains(channel.name) =>
       // just joined a channel
       outgoing.get ! ServerMessage.JoinedChannel(
-        channelsJoining(channel.name), channel, users.toSeq, messages)
+        channelsJoining(channel.name),
+        channel,
+        users.toSeq,
+        messages
+      )
       channelsJoining -= channel.name
-      channelsJoined += channel.uuid -> sender
+      channelsJoined += channel.name -> sender
       clientKnownUsers ++= users
       channelMembers += channel.uuid -> users
       handleChannelBroadcast(b, sendMessages = false)
 
-    case b @ ChannelBroadcast(channel, _, _) if channelsJoined.contains(channel.uuid) =>
+    case b @ ChannelBroadcast(channel, _, _)
+        if channelsJoined.contains(channel.name) =>
       handleChannelBroadcast(b)
-
   }
 
   private def nextServerMessageSeq() = {
@@ -88,7 +98,8 @@ class UserActor(uuid: UUID, daemon: ActorRef, e: Entropy) extends Actor with Act
     _nextServerMessageSeq
   }
 
-  private def handleChannelBroadcast(b: ChannelBroadcast, sendMessages: Boolean = true): Unit = {
+  private def handleChannelBroadcast(b: ChannelBroadcast,
+                                     sendMessages: Boolean = true): Unit = {
     val ChannelBroadcast(channel, users, newMessages) = b
     val newUsers = users -- clientKnownUsers
 
@@ -99,17 +110,22 @@ class UserActor(uuid: UUID, daemon: ActorRef, e: Entropy) extends Actor with Act
           channel = channel,
           joinedUsers = (users -- channelMembers(channel.uuid)).toSeq,
           leftUsers = (channelMembers(channel.uuid) -- users).toSeq,
-          newMessages = if (sendMessages) newMessages else Nil)),
-      newUsers = newUsers.toSeq)
+          newMessages =
+            if (sendMessages) newMessages
+            else Nil
+        )
+      ),
+      newUsers = newUsers.toSeq
+    )
 
     channelMembers += channel.uuid -> users
     clientKnownUsers ++= newUsers
   }
 
   private def hookBeforeReceive: Receive = {
-    case m: UserDisconnected if m.userUuid == uuid =>
+    case UserDisconnected(None) =>
       log.debug("user disconnected, stopping")
-      daemon ! m
+      daemon ! UserDisconnected(userIdentity)
       context.stop(self)
     case UserMessage.Ping(seqNo) =>
       outgoing.get ! ServerMessage.Pong(seqNo)

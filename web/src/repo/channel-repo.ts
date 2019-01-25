@@ -38,8 +38,6 @@ export class ChannelRepo implements ChannelStore {
   @observable.ref
   userUuids: string[] = [];
 
-  private uuid?: string;
-
   constructor(readonly channelName: string,
               private readonly userIdentity: Readonly<Model.User>,
               readonly userPool: Map<string, Readonly<Model.User>>,
@@ -71,13 +69,13 @@ export class ChannelRepo implements ChannelStore {
       text,
       uuid: nonce8(),
       userUuid: this.userIdentity.uuid,
-      channelUuid: this.uuid!,
+      channelName: this.channelName,
     };
 
     this.messages.set(tmpMessage.uuid, tmpMessage);
 
     try {
-      const { msg } = await this.eventSink.sendChat(this.uuid!, text);
+      const { msg } = await this.eventSink.sendChat(this.channelName, text);
       runInAction(() => {
         this.messages.delete(tmpMessage.uuid);
         this.messages.set(msg.uuid, mapChatMessage(msg));
@@ -92,7 +90,7 @@ export class ChannelRepo implements ChannelStore {
 
   @action
   onChannelBroadcast(b: ServerChannelBroadcast) {
-    Debug.assert(this.uuid === b.channelUuid && this.channelName === b.channelName, "channel uuid or channelName mismatch");
+    Debug.assert(this.channelName === b.channelName, "channel uuid or channelName mismatch");
 
     if (b.leftUsers.length || b.joinedUsers.length) {
       // merge users
@@ -121,7 +119,7 @@ export class ChannelRepo implements ChannelStore {
     this.assertState(ChannelState.joined);
     this.state = ChannelState.left;
     try {
-      const { reason } = await this.eventSink.leaveChannel(this.uuid!);
+      const { reason } = await this.eventSink.leaveChannel(this.channelName);
       logger.debug(`left channel=${this.channelName}: ${reason}`);
     } finally {
     }
@@ -133,7 +131,6 @@ export class ChannelRepo implements ChannelStore {
     const { channel, users, history } = joined;
 
     this.state = ChannelState.joined;
-    this.uuid = channel.uuid;
 
     for (const u of users) {
       this.userPool.set(u.uuid, u);
@@ -160,7 +157,7 @@ function mapChatMessage(m: ChatroomChatMessage): Model.ChatMessage {
   return ({
     uuid: m.uuid,
     userUuid: m.userUuid,
-    channelUuid: m.channelUuid,
+    channelName: m.channelName,
     text: m.text,
     timestamp: m.timestamp,
   });

@@ -124,10 +124,7 @@ const MessageList = lazyComponent(
 const MessageListItem = lazyComponent(
   (props: { msg: Model.ChatMessage, userPool: UserPool }) => {
     const { msg, userPool } = props;
-    const u = userPool.get(msg.userUuid);
-    if (!u) {
-      throw new Error('user not in userPool');
-    }
+    const u = userPool.get(msg.userUuid) || { uuid: "none", name: "Unknown User" };
     const date = msg.timestamp ? new Date(msg.timestamp!).toString() : 'sending ...';
     return (
       <Paper elevation={1} className="message-list-item">

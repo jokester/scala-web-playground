@@ -4,7 +4,7 @@ export namespace Model {
   export interface ChatMessage {
     uuid: string;
     userUuid: string;
-    channelUuid: string;
+    channelName: string;
     text: string;
     timestamp?: string;
     // true when failed to send messages

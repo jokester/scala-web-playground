@@ -18,7 +18,9 @@ class BlobHandler(repo: BlobRepo) extends LazyLogging with BlobSerialization {
     (path("multipart") & post & pathEnd & withSizeLimit(16777216)) {
       fileUpload("blob") {
         case (metadata, bytesSource) =>
-          val stream = bytesSource.runWith(StreamConverters.asInputStream(FiniteDuration(10, TimeUnit.SECONDS)))
+          val stream = bytesSource.runWith(
+            StreamConverters.asInputStream(FiniteDuration(10, TimeUnit.SECONDS))
+          )
           val meta = repo.saveBlob(metadata.getContentType.toString(), stream)
           complete(meta)
       }

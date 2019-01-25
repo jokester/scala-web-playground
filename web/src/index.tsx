@@ -38,10 +38,9 @@ if (isProdBuild) {
   // Learn more about service workers: http://bit.ly/CRA-PWA
   serviceWorker.unregister();
   defaultRoutine(appRepo);
-
 } else {
   registerHMR();
-  tryRepoRoutine(appRepo);
+  defaultRoutine(appRepo);
 }
 
 render();

@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import akka.NotUsed
 import akka.actor._
-import akka.http.scaladsl.model.ws.{ Message, TextMessage }
+import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.OverflowStrategy
@@ -27,7 +27,8 @@ class WsEchoHandler(implicit system: ActorSystem) extends LazyLogging {
       .collect { case tm: TextMessage if tm.isStrict => tm }
       .to(Sink.actorRef(userActor, ConnectionClose))
 
-    val outgoing = Source.actorRef[TextMessage](10, OverflowStrategy.fail)
+    val outgoing = Source
+      .actorRef[TextMessage](10, OverflowStrategy.fail)
       .mapMaterializedValue { outgoingActor =>
         userActor ! UserActor.OutgoingActor(outgoingActor)
       }

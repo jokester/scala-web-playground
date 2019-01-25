@@ -1,20 +1,16 @@
 package io.jokester.scala_server_playground.toy
 
-import org.scalatest.{ AsyncWordSpec, Matchers }
-import scalikejdbc.config.DBs
-import scalikejdbc.{ ConnectionPool, DB }
+import org.scalatest.{AsyncWordSpec, Matchers}
 
 class ToyDBRepoBasicTest extends AsyncWordSpec with Matchers {
 
-  DBs.setupAll
+  import io.jokester.scala_server_playground.TestUtil.getDB
 
   "ToyDatabaseRepo" should {
-    val cpool = ConnectionPool('default)
-
     testRepo(new ToyRepoMemoryUnsafe)
     testRepo(new ToyRepoMemorySynced)
-    testRepo(new ToyDBRepoBasic(() => DB(cpool.borrow)))
-    testRepo(new ToyDBRepoNolock(() => DB(cpool.borrow)))
+    testRepo(new ToyDBRepoBasic(getDB))
+    testRepo(new ToyDBRepoNolock(getDB))
   }
 
   def testRepo(repo: ToyRepo): Unit = {

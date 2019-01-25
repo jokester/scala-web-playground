@@ -6,7 +6,7 @@ import java.util.UUID
 
 import com.google.common.io.ByteStreams
 import io.jokester.scala_server_playground.util.Entropy
-import scalikejdbc.{ DB, ResultName, WrappedResultSet, _ }
+import scalikejdbc.{DB, ResultName, WrappedResultSet, _}
 
 class BlobRepoPG(getDB: () => DB)(implicit e: Entropy) extends BlobRepo {
 
@@ -15,7 +15,11 @@ class BlobRepoPG(getDB: () => DB)(implicit e: Entropy) extends BlobRepo {
 
     def apply(g: ResultName[Blob])(rs: WrappedResultSet): Blob = {
       val b = ByteBuffer.wrap(rs.bytes(g.bytes))
-      Blob(id = UUID.fromString(rs.string(g.id)), contentType = rs.string(g.contentType), bytes = b)
+      Blob(
+        id = UUID.fromString(rs.string(g.id)),
+        contentType = rs.string(g.contentType),
+        bytes = b
+      )
     }
   }
 
@@ -32,8 +36,10 @@ class BlobRepoPG(getDB: () => DB)(implicit e: Entropy) extends BlobRepo {
 
   override def saveBlob(b: Blob): BlobMeta = {
     getDB() localTx { implicit session =>
-      sql""" INSERT INTO blobs (id, content_type, bytes) VALUES (uuid(${b.id}), ${b.contentType}, ${b.bytesStream(): InputStream}) """
-        .update().apply()
+      sql""" INSERT INTO blobs (id, content_type, bytes) VALUES (uuid(${b.id}), ${b.contentType}, ${b
+        .bytesStream(): InputStream}) """
+        .update()
+        .apply()
     }
     b.meta
   }
@@ -41,7 +47,9 @@ class BlobRepoPG(getDB: () => DB)(implicit e: Entropy) extends BlobRepo {
   override def getBlob(id: UUID): Option[Blob] = {
     getDB() readOnly { implicit session =>
       sql"SELECT * FROM blobs WHERE id = $id"
-        .map(readBlob).single.apply
+        .map(readBlob)
+        .single
+        .apply
     }
   }
 
@@ -50,20 +58,24 @@ class BlobRepoPG(getDB: () => DB)(implicit e: Entropy) extends BlobRepo {
     Blob(
       id = UUID.fromString(rs.string("id")),
       contentType = rs.string("content_type"),
-      bytes = ByteBuffer.wrap(ByteStreams.toByteArray(rs.binaryStream("bytes"))))
+      bytes = ByteBuffer.wrap(ByteStreams.toByteArray(rs.binaryStream("bytes")))
+    )
   }
 
   def readBlobMeta(rs: WrappedResultSet): BlobMeta = {
     BlobMeta(
       id = UUID.fromString(rs.string("id")),
       contentType = rs.string("content_type"),
-      numBytes = rs.int("len_bytes"))
+      numBytes = rs.int("len_bytes")
+    )
   }
 
   def getBlobMeta(id: UUID): Option[BlobMeta] = {
     getDB() readOnly { implicit session =>
       sql"SELECT id, content_type, LEN(bytes) FROM blobs WHERE id = $id"
-        .map(readBlobMeta).single.apply
+        .map(readBlobMeta)
+        .single
+        .apply
     }
   }
 }

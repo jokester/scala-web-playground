@@ -23,3 +23,14 @@ services:
     ports:
       - 59379:6379
     restart: always
+
+  nginx-front:
+    image: alpine:3.9
+    network_mode: host
+    volumes:
+      - "../web/build:/web:ro"
+      - "./certs:/certs:ro"
+      - "./nginx-conf.d:/etc/nginx/conf.d:ro"
+    command: |
+      sh -c "apk add --update nginx ; mkdir -pv /run/nginx && ln -svf /dev/stdout /var/log/nginx/access.log && ln -svf /dev/stderr /var/log/nginx/error.log && exec nginx -g 'daemon off;'"
+    restart: always

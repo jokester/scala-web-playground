@@ -27,7 +27,7 @@
     "tslib": "^1.9.3",
     "whatwg-fetch": "^3.0.0"
   },
-  "homepage": "not-a-url",
+  "homepage": "/",
   "devDependencies": {
     "@babel/core": "^7.1.5",
     "@storybook/addon-actions": "^4.0.6",

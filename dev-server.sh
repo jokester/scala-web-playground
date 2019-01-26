@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 cd "$(dirname "$0")/server"
 set -ue
 if [[ $# -eq 0 ]]; then

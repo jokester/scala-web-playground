@@ -3,14 +3,14 @@ import { action, observable, runInAction } from "mobx";
 import { createEventPipe, WsState } from "../realworld";
 import { ServerBroadcast } from "../../src-gen";
 import { Model } from "../model";
-import { getLogger, getWebpackEnv } from "../util";
+import { getLogger } from "../util";
 import { Debug } from "../util/debug";
 import { DeepReadonly } from "../commonutil/type/freeze";
+import { buildConfig } from "../config";
 
 export function createRepo() {
   // FIXME: should disable retry of ws, and alert when disconnected
-  const buildEnv = getWebpackEnv<{ REACT_APP_WS_URL: string }>();
-  const pipe = createEventPipe(buildEnv.REACT_APP_WS_URL);
+  const pipe = createEventPipe(buildConfig.wsUrl);
   return new AppRepo(pipe);
 }
 

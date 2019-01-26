@@ -1,3 +1,3 @@
 # vim: ft=sh
-export REACT_APP_str1=value
-export REACT_APP_WS_URL="ws://127.0.0.1:18080/chatroom/ws"
+export REACT_APP_WS_ORIGIN="ws://127.0.0.1:18080"
+export REACT_APP_WS_PATH="/chatroom/ws"

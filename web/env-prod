@@ -1,2 +1,3 @@
 # vim: ft=sh
-export REACT_APP_str1=value
+export REACT_APP_WS_ORIGIN="wss://scala-web-playground.jokester.io"
+export REACT_APP_WS_PATH="/chatroom/ws"

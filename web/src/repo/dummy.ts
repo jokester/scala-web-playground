@@ -1,7 +1,7 @@
-import { getWebpackEnv } from "../util";
 import { AppRepo, createRepo } from "./app-repo";
 import { wait } from "../commonutil/async";
 import { createEventPipe } from "../realworld";
+import { buildConfig } from "../config";
 
 export async function defaultRoutine(appRepo: AppRepo) {
   await wait(1e3);
@@ -40,8 +40,7 @@ export async function tryRepoRoutine(appRepo: AppRepo) {
 }
 
 export async function tryConnection() {
-  const buildEnv = getWebpackEnv<{ REACT_APP_WS_URL: string }>();
-  const pipe = createEventPipe(buildEnv.REACT_APP_WS_URL);
+  const pipe = createEventPipe(buildConfig.wsUrl);
   const appRepo = new AppRepo(pipe);
   await appRepo.startConnect();
   await appRepo.auth("nick", "otp");

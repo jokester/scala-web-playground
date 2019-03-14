@@ -1,5 +1,6 @@
 package io.jokester.scala_server_playground.hello
 
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
@@ -32,5 +33,26 @@ class HelloRouteTest extends WordSpec with Matchers with ScalatestRouteTest {
         responseAs[String] shouldEqual "404 noooot found"
       }
     }
+
   }
+
+  "patch route" should {
+    "support patch method" in {
+
+      Patch("/try-patch") ~> route ~> check {
+        responseAs[String] shouldEqual "patch!"
+      }
+
+      Post("/try-patch") ~> route ~> check {
+        response.status shouldEqual StatusCodes.NotFound
+      }
+
+      Post("/try-patch?_method=PATCH") ~> route ~> check {
+        responseAs[String] shouldEqual "patch!"
+      }
+
+    }
+
+  }
+
 }
